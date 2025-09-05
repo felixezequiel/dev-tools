@@ -5,10 +5,11 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/Button'
 import { TextareaWithValidation } from '@/components/ui/TextareaWithValidation'
 import { Badge } from '@/components/ui/Badge'
-import { useDataConversion } from '@/hooks/useDataConversion'
+import { useDataBuilder } from '@/hooks/useDataBuilder'
 import { useValidation, validationRules } from '@/hooks/useValidation'
+import { createEntrySource, inputFormats } from '@/lib/entrySources'
 import { downloadFile, copyToClipboard } from '@/lib/utils'
-import { FileText, Download, Copy, Check, AlertCircle, Zap, Loader2 } from 'lucide-react'
+import { FileText, Download, Copy, Check, AlertCircle, Zap, Loader2, Code, Database, Table } from 'lucide-react'
 import { useThemeContext } from '@/components/common/ThemeProvider'
 
 // SyntaxHighlighter será carregado dinamicamente no componente wrapper
@@ -73,14 +74,26 @@ function SyntaxHighlighterWrapper({ code, isDark }: { code: string; isDark: bool
 
 export function JsonConverterPage() {
     const [input, setInput] = useState('')
+    const [inputType, setInputType] = useState<'key-value' | 'json' | 'csv'>('key-value')
     const [copied, setCopied] = useState(false)
-    const { isConverting, result, convert } = useDataConversion()
+    const { isBuilding, result, buildFromSource } = useDataBuilder()
     const { isDark } = useThemeContext()
 
-    // Validação para o campo de entrada
-    const inputValidation = useValidation([
-        validationRules.keyValueFormat()
-    ])
+    // Validação baseada no tipo de entrada
+    const getValidationRules = useCallback(() => {
+        switch (inputType) {
+            case 'key-value':
+                return [validationRules.keyValueFormat()]
+            case 'json':
+                return [validationRules.jsonFormat()]
+            case 'csv':
+                return [validationRules.required('Dados CSV')]
+            default:
+                return [validationRules.keyValueFormat()]
+        }
+    }, [inputType])
+
+    const inputValidation = useValidation(getValidationRules())
 
     // Função de validação em tempo real
     const validateInput = useCallback((value: string) => {
@@ -90,43 +103,26 @@ export function JsonConverterPage() {
     // Handler para mudança de input com validação
     const handleInputChange = useCallback((value: string) => {
         setInput(value)
-        // Limpar resultado anterior quando o input muda
-        if (result) {
-            // Opcional: podemos adicionar um clearResult no hook useDataConversion
-        }
-    }, [result])
+    }, [])
+
+    // Handler para mudança de tipo de entrada
+    const handleInputTypeChange = useCallback((type: 'key-value' | 'json' | 'csv') => {
+        setInputType(type)
+        setInput('') // Limpar input ao mudar tipo
+    }, [])
 
     const handleConvert = async () => {
         // Validar antes de converter
         const validation = inputValidation.validateField(input)
         if (!validation.isValid || !input.trim()) return
 
-        // Aqui você integraria com a lógica real do backend
-        // Por enquanto, vamos simular uma conversão
-        await convert(async (data: string) => {
-            // Simulação de conversão - em produção, isso seria feito pelo backend
-            const lines = data.split('\n').filter(line => line.trim())
-            const json: any = {}
-
-            lines.forEach(line => {
-                const [key, value] = line.split('=')
-                if (key && value) {
-                    const path = key.split('.')
-                    let current = json
-
-                    path.forEach((part, index) => {
-                        if (index === path.length - 1) {
-                            current[part] = value
-                        } else {
-                            current[part] = current[part] || {}
-                            current = current[part]
-                        }
-                    })
-                }
-            })
-
-            return json
-        }, input)
+        try {
+            const entrySource = createEntrySource(input, inputType)
+            await buildFromSource(entrySource)
+        } catch (error) {
+            console.error('Erro ao criar EntrySource:', error)
+            // Tratar erro de criação do EntrySource
+        }
     }
 
     const handleCopy = async () => {
@@ -187,26 +183,58 @@ export function JsonConverterPage() {
                             </div>
                         </CardHeader>
                         <CardContent className="space-y-4">
+                            {/* Seletor de tipo de entrada */}
+                            <div className="flex space-x-2">
+                                {Object.entries(inputFormats).map(([key, format]) => (
+                                    <Button
+                                        key={key}
+                                        variant={inputType === key ? 'default' : 'outline'}
+                                        size="sm"
+                                        onClick={() => handleInputTypeChange(key as any)}
+                                        className="flex items-center space-x-1"
+                                    >
+                                        {key === 'key-value' && <Code className="h-3 w-3" />}
+                                        {key === 'json' && <Database className="h-3 w-3" />}
+                                        {key === 'csv' && <Table className="h-3 w-3" />}
+                                        <span>{format.name}</span>
+                                    </Button>
+                                ))}
+                            </div>
+
+                            {/* Descrição do formato atual */}
+                            <div className="text-sm text-muted-foreground">
+                                <p>{inputFormats[inputType].description}</p>
+                            </div>
+
                             <TextareaWithValidation
-                                placeholder="user.name=John&#10;user.age=30&#10;user.email=john@example.com"
+                                placeholder={inputFormats[inputType].placeholder}
                                 value={input}
                                 onChange={handleInputChange}
                                 onValidate={validateInput}
                                 successMessage="Formato válido"
                                 className="min-h-[300px] font-mono text-sm"
                             />
+
+                            {/* Botão para carregar exemplo */}
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => setInput(inputFormats[inputType].example)}
+                            >
+                                Carregar Exemplo
+                            </Button>
                             <div className="flex items-center justify-between">
                                 <div className="text-sm text-muted-foreground">
                                     {input.split('\n').filter(line => line.trim()).length} linhas
                                 </div>
                                 <Button
                                     onClick={handleConvert}
-                                    disabled={!input.trim() || isConverting || inputValidation.hasErrors}
-                                    loading={isConverting}
+                                    disabled={!input.trim() || isBuilding || inputValidation.hasErrors}
+                                    loading={isBuilding}
                                     variant={inputValidation.hasErrors ? "destructive" : "default"}
                                 >
                                     <Zap className="mr-2 h-4 w-4" />
-                                    {inputValidation.hasErrors ? "Corrigir Erros" : "Converter"}
+                                    {inputValidation.hasErrors ? "Corrigir Erros" : "Converter para JSON"}
                                 </Button>
                             </div>
                         </CardContent>

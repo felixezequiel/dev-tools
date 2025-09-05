@@ -1,5 +1,4 @@
 import { EntrySource } from '../domain/entry-source';
-import { EntrySourceToJsonConverter } from './entry-source-to-json-converter';
 import { KeyPathParser } from '../domain/key-path-parser';
 import { ValueCoercer } from '../domain/value-coercer';
 import { StructureMutator } from '../domain/structure-mutator';
@@ -9,6 +8,7 @@ import { JsonToCsvBuilder } from './json-to-csv';
 import { DotBracketKeyPathFormatter } from '../infrastructure/key-path/dot-bracket-key-path-formatter';
 import { DefaultJsonToFormDataSerializer } from '../infrastructure/json/default-json-to-formdata-serializer';
 import { DefaultCsvFieldEscaper } from '../infrastructure/csv/csv-escaper';
+import { EntrySourceToJsonConverter } from 'application/entry-source-to-json-converter';
 
 export class RebuildPipeline<TKey, TValue> {
     private readonly source: EntrySource<TKey, TValue>;

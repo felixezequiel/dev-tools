@@ -9,7 +9,7 @@ const tools: Tool[] = [
     {
         id: 'json-converter',
         name: 'Conversor JSON',
-        description: 'Converte fontes de entrada estruturadas em objetos JSON organizados',
+        description: 'Converte dados estruturados (chave-valor, JSON, CSV) em objetos JSON organizados com validação em tempo real',
         icon: 'FileText',
         path: '/json-converter',
         category: 'converter'
@@ -17,7 +17,7 @@ const tools: Tool[] = [
     {
         id: 'csv-converter',
         name: 'Conversor CSV',
-        description: 'Transforma dados JSON em arquivos CSV estruturados e formatados',
+        description: 'Transforma dados estruturados em arquivos CSV com formatação adequada e escape de caracteres especiais',
         icon: 'Table',
         path: '/csv-converter',
         category: 'converter'
@@ -25,7 +25,7 @@ const tools: Tool[] = [
     {
         id: 'formdata-converter',
         name: 'Conversor FormData',
-        description: 'Converte objetos JSON em FormData para envio de formulários',
+        description: 'Converte dados estruturados em FormData para envio de formulários web com preview interativo',
         icon: 'Database',
         path: '/formdata-converter',
         category: 'converter'
@@ -35,23 +35,23 @@ const tools: Tool[] = [
 const features = [
     {
         icon: Zap,
-        title: 'Rápido',
-        description: 'Conversões instantâneas com processamento otimizado'
+        title: 'Conversão Poderosa',
+        description: 'Suporte completo aos transformadores do DataReBuilder com múltiplos formatos de entrada'
     },
     {
         icon: Shield,
-        title: 'Seguro',
-        description: 'Processamento local, seus dados nunca saem do seu dispositivo'
+        title: 'Processamento Seguro',
+        description: 'Todo processamento é feito localmente usando as classes do domínio robustas'
     },
     {
         icon: Sparkles,
-        title: 'Moderno',
-        description: 'Interface elegante seguindo as melhores práticas de UX'
+        title: 'Interface Moderna',
+        description: 'Design elegante com validação em tempo real e feedback visual inteligente'
     },
     {
         icon: Clock,
-        title: 'Eficiente',
-        description: 'Ferramentas especializadas para cada tipo de conversão'
+        title: 'Performance Otimizada',
+        description: 'Lazy loading, code splitting e renderização otimizada para máxima eficiência'
     }
 ]
 
@@ -131,19 +131,19 @@ export function HomePage() {
                         <div className="flex h-6 w-6 items-center justify-center rounded-full bg-primary text-primary-foreground text-xs font-bold">
                             1
                         </div>
-                        <span>Selecione uma ferramenta</span>
+                        <span>Escolha o formato de entrada (JSON, chave-valor, CSV)</span>
                     </div>
                     <div className="flex items-center space-x-2">
                         <div className="flex h-6 w-6 items-center justify-center rounded-full bg-primary text-primary-foreground text-xs font-bold">
                             2
                         </div>
-                        <span>Insira ou faça upload dos dados</span>
+                        <span>Insira os dados com validação em tempo real</span>
                     </div>
                     <div className="flex items-center space-x-2">
                         <div className="flex h-6 w-6 items-center justify-center rounded-full bg-primary text-primary-foreground text-xs font-bold">
                             3
                         </div>
-                        <span>Baixe o resultado convertido</span>
+                        <span>Converta e baixe o resultado no formato desejado</span>
                     </div>
                 </div>
             </motion.div>
