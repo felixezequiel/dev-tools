@@ -1,11 +1,11 @@
-import { KeyPathParser } from '../domain/key-path-parser';
-import { ValueCoercer } from '../domain/value-coercer';
-import { StructureMutator } from '../domain/structure-mutator';
-import { EntrySource } from '../domain/entry-source';
 import { RebuildPipeline } from './rebuild-pipeline';
 import { DotBracketKeyPathParser } from '../infrastructure/key-path/dot-bracket-key-path-parser';
 import { LiteralStringValueCoercer } from '../infrastructure/value-coercers/literal-string-value-coercer';
 import { NestedPathStructureMutator } from '../infrastructure/structure-mutators/nested-path-structure-mutator';
+import type { KeyPathParser } from '../domain/key-path-parser';
+import type { ValueCoercer } from '../domain/value-coercer';
+import type { StructureMutator } from '../domain/structure-mutator';
+import type { EntrySource } from '../domain/entry-source';
 
 export class DataReBuilder {
     private readonly parser: KeyPathParser;

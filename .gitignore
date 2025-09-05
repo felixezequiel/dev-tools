@@ -40,3 +40,6 @@ Thumbs.db
 
 # Local IDE settings (optional)
 #.vscode/
+
+.playwright-mcp
+dist

@@ -1,7 +1,7 @@
 {
-  "name": "builder-data",
+  "name": "@builder/data",
   "version": "0.1.0",
-  "private": true,
+  "private": false,
   "type": "module",
   "scripts": {
     "test": "vitest run",
