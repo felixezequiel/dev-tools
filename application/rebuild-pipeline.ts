@@ -1,3 +1,4 @@
+
 import { EntrySource } from '../domain/entry-source';
 import { KeyPathParser } from '../domain/key-path-parser';
 import { ValueCoercer } from '../domain/value-coercer';
@@ -5,6 +6,14 @@ import { StructureMutator } from '../domain/structure-mutator';
 import { JsonOutputBuilder } from './ports/json-output-builder';
 import { JsonToFormDataBuilder } from './json-to-formdata';
 import { JsonToCsvBuilder } from './json-to-csv';
+import { JsonToSqlInsertBuilder, SqlInsertOptions } from './json-to-sql-insert';
+import { JsonToSqlUpdateBuilder, SqlUpdateOptions } from './json-to-sql-update';
+import { JsonToSqlCreateTableBuilder, SqlCreateTableOptions } from './json-to-sql-create-table';
+import { JsonToXmlBuilder, XmlOptions } from './json-to-xml';
+import { JsonToYamlBuilder, YamlOptions } from './json-to-yaml';
+import { JsonToJsonSchemaBuilder, JsonSchemaOptions, JsonSchema } from './json-to-json-schema';
+import { JsonToDatabaseMigrationBuilder, MigrationOptions, MigrationScript } from './json-to-database-migration';
+import { JsonToOpenApiBuilder, OpenApiOptions, OpenApiSpec } from './json-to-openapi';
 import { DotBracketKeyPathFormatter } from '../infrastructure/key-path/dot-bracket-key-path-formatter';
 import { DefaultJsonToFormDataSerializer } from '../infrastructure/json/default-json-to-formdata-serializer';
 import { DefaultCsvFieldEscaper } from '../infrastructure/csv/csv-escaper';
@@ -63,6 +72,77 @@ export class RebuildPipeline<TKey, TValue> {
             formatter: new DotBracketKeyPathFormatter(),
             serializer: new DefaultJsonToFormDataSerializer(),
             escaper: new DefaultCsvFieldEscaper(),
+        });
+        return builder.build(json);
+    }
+
+    toSqlInsert(options: SqlInsertOptions): string {
+        const json = this.toJSON();
+        const builder = new JsonToSqlInsertBuilder({
+            serializer: new DefaultJsonToFormDataSerializer(),
+            options
+        });
+        return builder.build(json);
+    }
+
+    toSqlUpdate(options: SqlUpdateOptions): string {
+        const json = this.toJSON();
+        const builder = new JsonToSqlUpdateBuilder({
+            serializer: new DefaultJsonToFormDataSerializer(),
+            options: { setQuoteIdentifiers: false, ...options }
+        });
+        return builder.build(json);
+    }
+
+    toSqlCreateTable(options: SqlCreateTableOptions): string {
+        const json = this.toJSON();
+        const builder = new JsonToSqlCreateTableBuilder({
+            options
+        });
+        return builder.build(json);
+    }
+
+    toXml(options?: XmlOptions): string {
+        const json = this.toJSON();
+        const builder = new JsonToXmlBuilder({
+            serializer: new DefaultJsonToFormDataSerializer(),
+            options
+        });
+        return builder.build(json);
+    }
+
+    toYaml(options?: YamlOptions): string {
+        const json = this.toJSON();
+        const builder = new JsonToYamlBuilder({
+            serializer: new DefaultJsonToFormDataSerializer(),
+            options
+        });
+        return builder.build(json);
+    }
+
+    toJsonSchema(options?: JsonSchemaOptions): JsonSchema {
+        const json = this.toJSON();
+        const builder = new JsonToJsonSchemaBuilder({
+            serializer: new DefaultJsonToFormDataSerializer(),
+            options
+        });
+        return builder.build(json);
+    }
+
+    toDatabaseMigration(options: MigrationOptions): MigrationScript {
+        const json = this.toJSON();
+        const builder = new JsonToDatabaseMigrationBuilder({
+            serializer: new DefaultJsonToFormDataSerializer(),
+            options
+        });
+        return builder.build(json);
+    }
+
+    toOpenApiSpec(options: OpenApiOptions): OpenApiSpec {
+        const json = this.toJSON();
+        const builder = new JsonToOpenApiBuilder({
+            serializer: new DefaultJsonToFormDataSerializer(),
+            options
         });
         return builder.build(json);
     }
