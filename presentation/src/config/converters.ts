@@ -1,6 +1,7 @@
 import type { InputType } from '@/config/data-support'
 import type { DataConverterConfig } from '@/types/converter'
 import { FormDataResult } from '@/components/common/results/FormDataResult'
+import { DBMigrationResult } from '@/components/common/results/DBMigrationResult'
 import { FileText, Table, Database, FileCode, FileJson, FileSpreadsheet } from 'lucide-react'
 
 export const converterConfigs: Record<string, DataConverterConfig> = {
@@ -191,6 +192,7 @@ export const converterConfigs: Record<string, DataConverterConfig> = {
         acceptedFileTypes: ['.json', '.csv', '.yaml', '.yml', '.xml', '.sql', '.txt', '.tsv', '.ts'],
         placeholder: 'Arraste um arquivo JSON, CSV, YAML, XML, SQL ou TXT aqui',
         icon: Database,
+        ResultComponent: DBMigrationResult,
         usage: {
             summary: 'Crie migrações UP/DOWN e dados de seed a partir de exemplos, agilizando prototipação.',
             useCases: [

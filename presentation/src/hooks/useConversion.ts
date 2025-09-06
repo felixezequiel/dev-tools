@@ -3,6 +3,7 @@ import type { EntrySource } from '@builder/data'
 import { useDataBuilder } from '@/hooks/useDataBuilder'
 import { copyToClipboard, downloadFile } from '@/lib/utils'
 import type { DataConverterConfig } from '@/types/converter'
+import { formatSql } from '@/lib/sqlFormatter'
 
 type SqlMode = 'insert' | 'update' | 'create-table'
 
@@ -88,10 +89,12 @@ export function useConversion(config: DataConverterConfig) {
             case 'json-schema':
                 return typeof result.data === 'string' ? result.data : JSON.stringify(result.data, null, 2)
             case 'csv':
+                return typeof result.data === 'string' ? result.data : String(result.data)
             case 'sql':
             case 'sql-insert':
             case 'sql-update':
             case 'sql-create-table':
+                return formatSql(typeof result.data === 'string' ? result.data : String(result.data))
             case 'xml':
             case 'yaml':
             case 'db-migration':
@@ -142,6 +145,7 @@ export function useConversion(config: DataConverterConfig) {
             case 'sql-update':
             case 'sql-create-table':
                 content = typeof result.data === 'string' ? result.data : String(result.data)
+                content = formatSql(content)
                 filename = 'converted-data.sql'
                 mimeType = 'text/sql'
                 break

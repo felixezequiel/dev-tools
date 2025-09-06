@@ -12,6 +12,7 @@ import { useInputValidationByType } from '@/hooks/useInputValidation'
 import { createEntrySource, inputFormats } from '@/lib/entrySources'
 import type { InputType } from '@/config/data-support'
 import { SyntaxHighlighterWrapper } from '@/components/common/ui/SyntaxHighlighterWrapper'
+// yaml rendering handled via dynamic require inside render to avoid type issues
 // ResultRendererProps é usado apenas para tipos no ResultComponent
 import { InputModeToggle } from '@/components/common/ui/InputModeToggle'
 import { InputTypeButtons } from '@/components/common/ui/InputTypeButtons'
@@ -129,35 +130,6 @@ export function DataConverterLayout({ config, breadcrumbs }: DataConverterLayout
 
     const handleDownload = () => {
         download()
-    }
-
-    const getSyntaxHighlighter = () => {
-        if (config.outputFormat === 'json' && typeof result?.data === 'object') {
-            return (
-                <Suspense fallback={<div className="flex items-center justify-center h-[200px]"><Loader2 className="h-6 w-6 animate-spin" /></div>}>
-                    <SyntaxHighlighterWrapper code={JSON.stringify(result.data, null, 2)} />
-                </Suspense>
-            )
-        }
-
-        if (config.outputFormat === 'formdata' && result?.data instanceof FormData) {
-            const entries = Array.from(result.data.entries())
-            const formattedEntries = entries
-                .map(([key, value]) => `${key}=${value}`)
-                .join('\n')
-
-            return (
-                <pre className="text-sm font-mono whitespace-pre-wrap overflow-x-auto">
-                    {formattedEntries}
-                </pre>
-            )
-        }
-
-        return (
-            <pre className="text-sm font-mono whitespace-pre-wrap overflow-x-auto">
-                {typeof result?.data === 'string' ? result.data : JSON.stringify(result?.data, null, 2)}
-            </pre>
-        )
     }
 
     return (
@@ -290,7 +262,7 @@ export function DataConverterLayout({ config, breadcrumbs }: DataConverterLayout
                                         {config.outputDescription}
                                     </CardDescription>
                                 </div>
-                                {result?.success && (
+                                {result?.success && !config.ResultComponent && (
                                     <div className="flex space-x-2">
                                         <Button variant="outline" size="sm" onClick={handleCopy}>
                                             {copied ? (
@@ -361,8 +333,30 @@ export function DataConverterLayout({ config, breadcrumbs }: DataConverterLayout
                                                 </Button>
                                             </div>
                                         )}
-                                        <div className="rounded-md border bg-muted/50 p-4">
-                                            {getSyntaxHighlighter()}
+                                        <div className="rounded-md border bg-muted/50 p-4 overflow-x-auto">
+                                            <div className="min-w-full">
+                                                {(() => {
+                                                    if (config.outputFormat === 'json' && typeof result?.data === 'object') {
+                                                        return (
+                                                            <Suspense fallback={<div className="flex items-center justify-center h-[200px]"><Loader2 className="h-6 w-6 animate-spin" /></div>}>
+                                                                <SyntaxHighlighterWrapper code={JSON.stringify(result.data, null, 2)} />
+                                                            </Suspense>
+                                                        )
+                                                    }
+                                                    if (config.outputFormat === 'yaml') {
+                                                        const yamlText = typeof result?.data === 'string' ? result.data : (require('js-yaml') as any).dump(result?.data ?? {}, { indent: 2, lineWidth: 120 })
+                                                        return (<pre className="text-sm font-mono whitespace-pre min-w-full overflow-x-auto">{yamlText}</pre>)
+                                                    }
+                                                    if (config.outputFormat === 'formdata' && result?.data instanceof FormData) {
+                                                        const entries = Array.from(result.data.entries())
+                                                        const formattedEntries = entries.map(([key, value]) => `${key}=${value}`).join('\n')
+                                                        return (<pre className="text-sm font-mono whitespace-pre min-w-full overflow-x-auto">{formattedEntries}</pre>)
+                                                    }
+                                                    return (
+                                                        <pre className="text-sm font-mono whitespace-pre min-w-full overflow-x-auto">{typeof result?.data === 'string' ? result.data : JSON.stringify(result?.data, null, 2)}</pre>
+                                                    )
+                                                })()}
+                                            </div>
                                         </div>
                                     </div>
                                 )
