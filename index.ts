@@ -26,5 +26,6 @@ export * from './infrastructure/entry-sources/csv-data-entry-source';
 export * from './infrastructure/parsers/csv-parser';
 export * from './infrastructure/csv/csv-escaper';
 export * from './infrastructure/json/default-json-to-formdata-serializer';
+export * from './application/curl-parser';
 
 

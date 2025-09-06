@@ -193,5 +193,13 @@ export const validationRules = {
             })
         },
         message: 'Formato inválido. Use: chave=valor (uma por linha)'
+    }),
+
+    curlFormat: (): ValidationRule => ({
+        test: (value: string) => {
+            if (!value.trim()) return true
+            return /^curl\b/.test(value.trim())
+        },
+        message: 'Entrada cURL inválida (deve começar com "curl")'
     })
 }

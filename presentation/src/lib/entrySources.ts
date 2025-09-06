@@ -1,5 +1,6 @@
 // Implementações de EntrySource para diferentes tipos de entrada
 import type { EntrySource } from '@builder/data'
+import { parseCurlToJson } from '@builder/data'
 import yaml from 'js-yaml'
 import { XMLParser } from 'fast-xml-parser'
 
@@ -46,11 +47,15 @@ export class ArrayEntrySource<TValue> implements EntrySource<number, TValue> {
 }
 
 // Factory function para criar EntrySource baseada na entrada
-export function createEntrySource(input: string, type: 'formdata' | 'json' | 'csv' | 'yaml' | 'xml' | 'openapi' | 'json-schema' | 'sql' = 'formdata'): EntrySource<any, any> {
+export function createEntrySource(input: string, type: 'formdata' | 'curl' | 'json' | 'csv' | 'yaml' | 'xml' | 'openapi' | 'json-schema' | 'sql' = 'formdata'): EntrySource<any, any> {
     switch (type) {
         case 'formdata':
             // FormData textual input is treated as chave=valor lines
             return createKeyValueEntrySource(input)
+        case 'curl': {
+            const parsed = parseCurlToJson(input)
+            return new ObjectEntrySource(parsed as any)
+        }
         case 'json':
             return createJsonEntrySource(input)
         case 'csv':
@@ -278,6 +283,12 @@ export const inputFormats = {
         description: 'Texto no formato chave=valor (uma por linha), como campos de FormData',
         example: 'name=John\nage=30\nemail=john@example.com',
         placeholder: 'name=John\nage=30\nemail=john@example.com'
+    },
+    'curl': {
+        name: 'cURL',
+        description: 'Comando cURL completo (ex.: curl -X POST ...)',
+        example: "curl -X POST 'https://api.example.com/users?active=true' -H 'Authorization: Bearer TOKEN' -H 'Content-Type: application/json' -d '{\"name\":\"John\",\"age\":30}'",
+        placeholder: "curl 'https://api.example.com/endpoint' -H 'Accept: application/json'"
     },
     'json': {
         name: 'JSON',

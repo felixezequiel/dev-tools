@@ -7,6 +7,8 @@ export function useInputValidationByType(inputType: InputType) {
         switch (inputType) {
             case 'formdata':
                 return [validationRules.keyValueFormat()]
+            case 'curl':
+                return [validationRules.curlFormat?.() ?? validationRules.required('cURL')]
             case 'json':
                 return [validationRules.jsonFormat()]
             case 'csv':
