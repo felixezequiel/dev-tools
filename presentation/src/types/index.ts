@@ -2,7 +2,8 @@ export interface Tool {
     id: string
     name: string
     description: string
-    icon: string
+    icon?: string
+    iconComponent?: any
     path: string
     category: 'converter' | 'formatter' | 'validator'
 }
@@ -35,6 +36,7 @@ export interface NavItem {
     title: string
     href: string
     icon?: string
+    iconComponent?: any
     badge?: string
     children?: NavItem[]
 }

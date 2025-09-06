@@ -5,9 +5,7 @@ import { PageLoader } from '@/components/common/PageLoader'
 
 // Lazy loading das páginas para melhor performance
 const HomePage = lazy(() => import('@/pages/HomePage').then(module => ({ default: module.HomePage })))
-const JsonConverterPage = lazy(() => import('@/pages/JsonConverterPage').then(module => ({ default: module.JsonConverterPage })))
-const CsvConverterPage = lazy(() => import('@/pages/CsvConverterPage').then(module => ({ default: module.CsvConverterPage })))
-const FormDataConverterPage = lazy(() => import('@/pages/FormDataConverterPage').then(module => ({ default: module.FormDataConverterPage })))
+const GenericConverterPage = lazy(() => import('@/pages/GenericConverterPage').then(module => ({ default: module.GenericConverterPage })))
 const NotFoundPage = lazy(() => import('@/pages/NotFoundPage').then(module => ({ default: module.NotFoundPage })))
 
 function App() {
@@ -16,9 +14,7 @@ function App() {
             <Routes>
                 <Route path="/" element={<DevToolsLayout />}>
                     <Route index element={<HomePage />} />
-                    <Route path="json-converter" element={<JsonConverterPage />} />
-                    <Route path="csv-converter" element={<CsvConverterPage />} />
-                    <Route path="formdata-converter" element={<FormDataConverterPage />} />
+                    <Route path=":slug" element={<GenericConverterPage />} />
                 </Route>
                 <Route path="*" element={<NotFoundPage />} />
             </Routes>

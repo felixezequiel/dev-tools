@@ -8,24 +8,14 @@ import { FileDropzone } from '@/components/common/FileDropzone'
 import { Badge } from '@/components/ui/Badge'
 import { useDataBuilder } from '@/hooks/useDataBuilder'
 import { useFileUpload } from '@/hooks/useFileUpload'
-import { useValidation, validationRules } from '@/hooks/useValidation'
+import { useInputValidationByType } from '@/hooks/useInputValidation'
+import { InputModeToggle } from '@/components/common/ui/InputModeToggle'
+import { InputTypeButtons } from '@/components/common/ui/InputTypeButtons'
+import { SectionHeading } from '@/components/common/ui/SectionHeading'
 import { createEntrySource, inputFormats } from '@/lib/entrySources'
-import { downloadFile, copyToClipboard } from '@/lib/utils'
-import {
-    FileText,
-    Download,
-    Copy,
-    Check,
-    AlertCircle,
-    Zap,
-    Loader2,
-    Code,
-    Database,
-    Table,
-    Upload,
-    Eye,
-    EyeOff
-} from 'lucide-react'
+import type { InputType } from '@/config/data-support'
+import { copyToClipboard } from '@/lib/utils'
+import { FileText, Copy, Check, AlertCircle, Zap, Eye, EyeOff, Database } from 'lucide-react'
 
 interface FormDataConverterLayoutProps {
     breadcrumbs: Array<{ label: string; path?: string; isActive?: boolean }>
@@ -33,7 +23,7 @@ interface FormDataConverterLayoutProps {
 
 export function FormDataConverterLayout({ breadcrumbs }: FormDataConverterLayoutProps) {
     const [input, setInput] = useState('')
-    const [inputType, setInputType] = useState<'key-value' | 'json' | 'csv'>('json')
+    const [inputType, setInputType] = useState<InputType>('json')
     const [inputMode, setInputMode] = useState<'manual' | 'file'>('manual')
     const [showPreview, setShowPreview] = useState(false)
     const [copied, setCopied] = useState(false)
@@ -41,26 +31,9 @@ export function FormDataConverterLayout({ breadcrumbs }: FormDataConverterLayout
     const { isBuilding, result, buildToFormData } = useDataBuilder()
     const { uploadedFile, uploadFile, removeFile } = useFileUpload()
 
-    // Validação baseada no tipo de entrada
-    const getValidationRules = useCallback(() => {
-        switch (inputType) {
-            case 'key-value':
-                return [validationRules.keyValueFormat()]
-            case 'json':
-                return [validationRules.jsonFormat()]
-            case 'csv':
-                return [validationRules.required('Dados CSV')]
-            default:
-                return [validationRules.jsonFormat()]
-        }
-    }, [inputType])
+    const { validation: inputValidation, validateInput } = useInputValidationByType(inputType)
 
-    const inputValidation = useValidation(getValidationRules())
-
-    // Função de validação em tempo real
-    const validateInput = useCallback((value: string) => {
-        return inputValidation.validateField(value)
-    }, [inputValidation])
+    // validateInput fornecido por hook centralizado
 
     // Handler para mudança de input com validação
     const handleInputChange = useCallback((value: string) => {
@@ -68,7 +41,7 @@ export function FormDataConverterLayout({ breadcrumbs }: FormDataConverterLayout
     }, [])
 
     // Handler para mudança de tipo de entrada
-    const handleInputTypeChange = useCallback((type: 'key-value' | 'json' | 'csv') => {
+    const handleInputTypeChange = useCallback((type: InputType) => {
         setInputType(type)
         setInput('')
         removeFile()
@@ -90,7 +63,7 @@ export function FormDataConverterLayout({ breadcrumbs }: FormDataConverterLayout
         if (result.success && result.file) {
             // Auto-detectar tipo baseado na extensão do arquivo
             const extension = file.name.split('.').pop()?.toLowerCase()
-            let detectedType: 'key-value' | 'json' | 'csv' = 'json'
+            let detectedType: InputType = 'json'
 
             switch (extension) {
                 case 'json':
@@ -99,6 +72,16 @@ export function FormDataConverterLayout({ breadcrumbs }: FormDataConverterLayout
                 case 'csv':
                 case 'tsv':
                     detectedType = 'csv'
+                    break
+                case 'yaml':
+                case 'yml':
+                    detectedType = 'yaml'
+                    break
+                case 'xml':
+                    detectedType = 'xml'
+                    break
+                case 'sql':
+                    detectedType = 'sql'
                     break
                 default:
                     detectedType = 'json'
@@ -152,12 +135,12 @@ export function FormDataConverterLayout({ breadcrumbs }: FormDataConverterLayout
     return (
         <div className="space-y-6">
             <PageHeader
-                title="Conversor FormData"
-                description="Converte dados estruturados em FormData para envio de formulários web com preview interativo"
+                title="Converter para FormData"
+                description="Escolha o modo de entrada (Digitar ou Arquivo) e o tipo de formato abaixo para inserir seus dados e gerar um FormData com preview."
                 breadcrumbs={breadcrumbs}
             />
 
-            <div className="grid gap-6 lg:grid-cols-2">
+            <div className="grid gap-8 lg:grid-cols-2">
                 {/* Input Section */}
                 <motion.div
                     initial={{ opacity: 0, x: -20 }}
@@ -173,57 +156,34 @@ export function FormDataConverterLayout({ breadcrumbs }: FormDataConverterLayout
                                         <span>Dados de Entrada</span>
                                     </CardTitle>
                                     <CardDescription>
-                                        Selecione o formato e insira os dados para conversão
+                                        Escolha o modo de entrada (Digitar ou Arquivo) e o tipo de formato abaixo para inserir seus dados.
                                     </CardDescription>
                                 </div>
                             </div>
                         </CardHeader>
-                        <CardContent className="space-y-4">
-                            {/* Seletor de modo de entrada */}
-                            <div className="flex space-x-2">
-                                <Button
-                                    variant={inputMode === 'manual' ? 'default' : 'outline'}
-                                    size="sm"
-                                    onClick={() => handleInputModeChange('manual')}
-                                    className="flex items-center space-x-1"
-                                >
-                                    <FileText className="h-3 w-3" />
-                                    <span>Digitar</span>
-                                </Button>
-                                <Button
-                                    variant={inputMode === 'file' ? 'default' : 'outline'}
-                                    size="sm"
-                                    onClick={() => handleInputModeChange('file')}
-                                    className="flex items-center space-x-1"
-                                >
-                                    <Upload className="h-3 w-3" />
-                                    <span>Arquivo</span>
-                                </Button>
+                        <CardContent>
+                            <div className="space-y-6">
+                            {/* Passo 1: Tipo de entrada */}
+                            <SectionHeading step={1} title="Escolha o tipo de dados" description="Selecione o formato que melhor representa seus dados." />
+                            <div className="space-y-2">
+                                <InputTypeButtons
+                                    allowedTypes={['key-value', 'json', 'csv', 'yaml', 'xml', 'openapi', 'json-schema', 'sql'] as any}
+                                    current={inputType}
+                                    onChange={handleInputTypeChange}
+                                />
                             </div>
 
-                            {/* Seletor de tipo de entrada */}
-                            <div className="flex space-x-2">
-                                {Object.entries(inputFormats).map(([key, format]) => (
-                                    <Button
-                                        key={key}
-                                        variant={inputType === key ? 'default' : 'outline'}
-                                        size="sm"
-                                        onClick={() => handleInputTypeChange(key as any)}
-                                        className="flex items-center space-x-1"
-                                    >
-                                        {key === 'key-value' && <Code className="h-3 w-3" />}
-                                        {key === 'json' && <Database className="h-3 w-3" />}
-                                        {key === 'csv' && <Table className="h-3 w-3" />}
-                                        <span>{format.name}</span>
-                                    </Button>
-                                ))}
+                            {/* Passo 2: Modo */}
+                            <SectionHeading step={2} title="Escolha como inserir" description="Digite manualmente ou envie um arquivo." />
+                            <div className="space-y-2">
+                                <InputModeToggle mode={inputMode} onChange={handleInputModeChange} />
                             </div>
 
-                            {/* Descrição do formato atual */}
-                            <div className="text-sm text-muted-foreground">
-                                <p>{inputFormats[inputType].description}</p>
-                            </div>
+                            {/* Dica do formato atual */}
+                            <div className="text-xs text-muted-foreground"><p>{inputFormats[inputType].description}</p></div>
 
+                            {/* Passo 3: Inserção de dados */}
+                            <SectionHeading step={3} title="Insira os dados" description="Cole ou digite os dados conforme o formato selecionado." />
                             {inputMode === 'manual' ? (
                                 <>
                                     <TextareaWithValidation
@@ -234,13 +194,7 @@ export function FormDataConverterLayout({ breadcrumbs }: FormDataConverterLayout
                                         successMessage="Formato válido"
                                         className="min-h-[300px] font-mono text-sm"
                                     />
-
-                                    {/* Botão para carregar exemplo */}
-                                    <Button
-                                        variant="outline"
-                                        size="sm"
-                                        onClick={() => setInput(inputFormats[inputType].example)}
-                                    >
+                                    <Button variant="outline" size="sm" onClick={() => setInput(inputFormats[inputType].example)}>
                                         Carregar Exemplo
                                     </Button>
                                 </>
@@ -248,8 +202,8 @@ export function FormDataConverterLayout({ breadcrumbs }: FormDataConverterLayout
                                 <FileDropzone
                                     onFileSelect={handleFileSelect}
                                     onFileRemove={handleFileRemove}
-                                    acceptedFileTypes={['.json', '.csv', '.txt', '.tsv', '.ts']}
-                                    placeholder="Arraste um arquivo JSON, CSV ou TXT aqui"
+                                    acceptedFileTypes={['.json', '.csv', '.yaml', '.yml', '.xml', '.sql', '.txt', '.tsv', '.ts']}
+                                    placeholder="Arraste um arquivo JSON, CSV, YAML, XML, SQL ou TXT aqui"
                                 />
                             )}
 
@@ -281,6 +235,7 @@ export function FormDataConverterLayout({ breadcrumbs }: FormDataConverterLayout
                                                 : "Converter para FormData"
                                     }
                                 </Button>
+                            </div>
                             </div>
                         </CardContent>
                     </Card>

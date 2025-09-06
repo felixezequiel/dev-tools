@@ -1,4 +1,6 @@
 import { useState, useCallback } from 'react'
+import yaml from 'js-yaml'
+import { XMLParser } from 'fast-xml-parser'
 
 export interface ValidationRule {
     test: (value: string) => boolean
@@ -89,6 +91,96 @@ export const validationRules = {
             }
         },
         message: 'Formato JSON inválido'
+    }),
+
+    yamlFormat: (): ValidationRule => ({
+        test: (value: string) => {
+            if (!value.trim()) return true
+            try {
+                yaml.load(value)
+                return true
+            } catch {
+                return false
+            }
+        },
+        message: 'Formato YAML inválido'
+    }),
+
+    xmlFormat: (): ValidationRule => ({
+        test: (value: string) => {
+            if (!value.trim()) return true
+            try {
+                const parser = new XMLParser({ ignoreAttributes: false })
+                parser.parse(value)
+                return true
+            } catch {
+                return false
+            }
+        },
+        message: 'Formato XML inválido'
+    }),
+
+    jsonOrYamlFormat: (): ValidationRule => ({
+        test: (value: string) => {
+            if (!value.trim()) return true
+            try {
+                JSON.parse(value)
+                return true
+            } catch {
+                try {
+                    yaml.load(value)
+                    return true
+                } catch {
+                    return false
+                }
+            }
+        },
+        message: 'Conteúdo inválido (esperado JSON ou YAML)'
+    }),
+
+    openApiFormat: (): ValidationRule => ({
+        test: (value: string) => {
+            if (!value.trim()) return true
+            try {
+                let obj: any
+                try {
+                    obj = JSON.parse(value)
+                } catch {
+                    obj = yaml.load(value)
+                }
+                return typeof obj === 'object' && obj !== null && (Boolean((obj as any).openapi) || Boolean((obj as any).swagger))
+            } catch {
+                return false
+            }
+        },
+        message: 'OpenAPI inválido (JSON/YAML)'
+    }),
+
+    jsonSchemaFormat: (): ValidationRule => ({
+        test: (value: string) => {
+            if (!value.trim()) return true
+            try {
+                let obj: any
+                try {
+                    obj = JSON.parse(value)
+                } catch {
+                    obj = yaml.load(value)
+                }
+                return typeof obj === 'object' && obj !== null && (Boolean((obj as any).$schema) || Boolean((obj as any).type) || Boolean((obj as any).properties))
+            } catch {
+                return false
+            }
+        },
+        message: 'JSON Schema inválido (JSON/YAML)'
+    }),
+
+    sqlFormat: (): ValidationRule => ({
+        test: (value: string) => {
+            if (!value.trim()) return true
+            const v = value.trim()
+            return /^(insert\s+into|create\s+table)/i.test(v) || /;\s*$/.test(v)
+        },
+        message: 'SQL inválido (suporta INSERT e CREATE TABLE básicos)'
     }),
 
     keyValueFormat: (): ValidationRule => ({

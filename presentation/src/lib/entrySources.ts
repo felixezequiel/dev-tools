@@ -1,5 +1,7 @@
 // Implementações de EntrySource para diferentes tipos de entrada
 import type { EntrySource } from '@builder/data'
+import yaml from 'js-yaml'
+import { XMLParser } from 'fast-xml-parser'
 
 export class KeyValuePairsEntrySource implements EntrySource<string, string> {
     constructor(private pairs: Array<[string, string]>) { }
@@ -44,7 +46,7 @@ export class ArrayEntrySource<TValue> implements EntrySource<number, TValue> {
 }
 
 // Factory function para criar EntrySource baseada na entrada
-export function createEntrySource(input: string, type: 'key-value' | 'json' | 'csv' = 'key-value'): EntrySource<any, any> {
+export function createEntrySource(input: string, type: 'key-value' | 'json' | 'csv' | 'yaml' | 'xml' | 'openapi' | 'json-schema' | 'sql' = 'key-value'): EntrySource<any, any> {
     switch (type) {
         case 'key-value':
             return createKeyValueEntrySource(input)
@@ -52,6 +54,16 @@ export function createEntrySource(input: string, type: 'key-value' | 'json' | 'c
             return createJsonEntrySource(input)
         case 'csv':
             return createCsvEntrySource(input)
+        case 'yaml':
+            return createYamlEntrySource(input)
+        case 'xml':
+            return createXmlEntrySource(input)
+        case 'openapi':
+            return createJsonEntrySource(parseOpenApiToJson(input))
+        case 'json-schema':
+            return createJsonEntrySource(parseJsonSchemaToJson(input))
+        case 'sql':
+            return createJsonEntrySource(parseSqlToJson(input))
         default:
             return createKeyValueEntrySource(input)
     }
@@ -79,6 +91,160 @@ function createJsonEntrySource(input: string): ObjectEntrySource {
     } catch (error) {
         throw new Error('JSON inválido')
     }
+}
+
+function createYamlEntrySource(input: string): ObjectEntrySource {
+    try {
+        const obj = yaml.load(input)
+        return new ObjectEntrySource(obj as Record<string, any>)
+    } catch (error) {
+        throw new Error('YAML inválido')
+    }
+}
+
+function createXmlEntrySource(input: string): ObjectEntrySource {
+    try {
+        const parser = new XMLParser({ ignoreAttributes: false, parseAttributeValue: true })
+        const obj = parser.parse(input)
+        return new ObjectEntrySource(obj)
+    } catch (error) {
+        throw new Error('XML inválido')
+    }
+}
+
+function parseOpenApiToJson(input: string): string {
+    try {
+        // OpenAPI pode ser JSON ou YAML; tentamos ambos
+        let obj: any
+        try {
+            obj = JSON.parse(input)
+        } catch {
+            obj = yaml.load(input)
+        }
+        return JSON.stringify(obj)
+    } catch {
+        throw new Error('OpenAPI inválido (JSON/YAML)')
+    }
+}
+
+function parseJsonSchemaToJson(input: string): string {
+    try {
+        // JSON Schema é JSON válido; aceitamos também YAML por conveniência
+        let obj: any
+        try {
+            obj = JSON.parse(input)
+        } catch {
+            obj = yaml.load(input)
+        }
+        return JSON.stringify(obj)
+    } catch {
+        throw new Error('JSON Schema inválido (JSON/YAML)')
+    }
+}
+
+function parseSqlToJson(input: string): string {
+    try {
+        const text = input.trim()
+        // Very basic detection and parsing
+        if (/^insert\s+into\s+/i.test(text)) {
+            // INSERT INTO table (a,b) VALUES (1,'x'),(2,'y');
+            const m = text.match(/insert\s+into\s+([\w"`\[\].]+)\s*\(([^)]+)\)\s*values\s*(.+);?/i)
+            if (!m) throw new Error('INSERT inválido')
+            const table = m[1]
+            const columns = m[2].split(',').map(s => s.trim().replace(/["`\[\]]/g, ''))
+            const valuesPart = m[3].trim()
+            const rowStrings = splitSqlValues(valuesPart)
+            const rows = rowStrings.map(rs => parseSqlRow(rs, columns))
+            return JSON.stringify({ type: 'insert', table, rows })
+        }
+        if (/^create\s+table\s+/i.test(text)) {
+            const m = text.match(/create\s+table\s+([\w"`\[\].]+)\s*\(([\s\S]+)\)\s*;?/i)
+            if (!m) throw new Error('CREATE TABLE inválido')
+            const table = m[1]
+            const body = m[2]
+            const columns: any[] = []
+            body.split(/,\s*\n|,\s*(?![^()]*\))/).forEach(line => {
+                const trimmed = line.trim()
+                const col = trimmed.match(/^["`\[]?([\w.]+)["`\]]?\s+([\w()]+)?/)
+                if (col) {
+                    columns.push({ name: col[1], type: col[2] || 'unknown', raw: trimmed })
+                }
+            })
+            return JSON.stringify({ type: 'create-table', table, columns })
+        }
+        // Fallback: return as plain text
+        return JSON.stringify({ type: 'sql', content: text })
+    } catch {
+        throw new Error('SQL inválido')
+    }
+}
+
+function splitSqlValues(valuesPart: string): string[] {
+    // Splits (....), (....) even with commas inside quotes
+    const rows: string[] = []
+    let depth = 0
+    let current = ''
+    for (let i = 0; i < valuesPart.length; i++) {
+        const ch = valuesPart[i]
+        current += ch
+        if (ch === '(') depth++
+        else if (ch === ')') depth--
+        else if (ch === ',' && depth === 0) {
+            rows.push(current.trim().replace(/^,/, ''))
+            current = ''
+        }
+    }
+    if (current.trim()) rows.push(current.trim())
+    return rows
+}
+
+function parseSqlRow(rowText: string, columns: string[]): any {
+    const inside = rowText.trim().replace(/^\(/, '').replace(/\)$/, '')
+    const values = splitCsvRespectingQuotes(inside)
+    const obj: any = {}
+    columns.forEach((c, i) => {
+        obj[c] = parseSqlValue(values[i])
+    })
+    return obj
+}
+
+function splitCsvRespectingQuotes(text: string): string[] {
+    const out: string[] = []
+    let current = ''
+    let inQuote = false
+    let quoteChar = ''
+    for (let i = 0; i < text.length; i++) {
+        const ch = text[i]
+        if ((ch === '"' || ch === "'") && (!inQuote || quoteChar === ch)) {
+            if (inQuote && text[i + 1] === ch) { // escaped quote
+                current += ch
+                i++
+                continue
+            }
+            inQuote = !inQuote
+            quoteChar = ch
+            continue
+        }
+        if (ch === ',' && !inQuote) {
+            out.push(current.trim())
+            current = ''
+            continue
+        }
+        current += ch
+    }
+    if (current.length) out.push(current.trim())
+    return out
+}
+
+function parseSqlValue(v?: string): any {
+    if (v === undefined) return null
+    const trimmed = v.trim()
+    if (trimmed === 'NULL' || trimmed.toLowerCase() === 'null') return null
+    if ((trimmed.startsWith("'") && trimmed.endsWith("'")) || (trimmed.startsWith('"') && trimmed.endsWith('"')))
+        return trimmed.slice(1, -1)
+    const num = Number(trimmed)
+    if (!Number.isNaN(num)) return num
+    return trimmed
 }
 
 function createCsvEntrySource(input: string): KeyValuePairsEntrySource {
@@ -123,5 +289,35 @@ export const inputFormats = {
         description: 'Arquivo CSV com cabeçalhos',
         example: 'name,age,email\nJohn,30,john@example.com\nJane,25,jane@example.com',
         placeholder: 'name,age,email\nJohn,30,john@example.com\nJane,25,jane@example.com'
+    },
+    'yaml': {
+        name: 'YAML',
+        description: 'Documento YAML (será normalizado para JSON)',
+        example: 'user:\n  name: John\n  age: 30\n  email: john@example.com',
+        placeholder: 'user:\n  name: John\n  age: 30'
+    },
+    'xml': {
+        name: 'XML',
+        description: 'Documento XML (será convertido para objeto)',
+        example: '<user><name>John</name><age>30</age></user>',
+        placeholder: '<root>...</root>'
+    },
+    'openapi': {
+        name: 'OpenAPI',
+        description: 'Especificação OpenAPI em JSON ou YAML',
+        example: 'openapi: 3.0.0\ninfo:\n  title: API\n  version: 1.0.0',
+        placeholder: '{ "openapi": "3.0.0", "info": { "title": "API" } }'
+    },
+    'json-schema': {
+        name: 'JSON Schema',
+        description: 'Schema JSON (aceita JSON ou YAML)',
+        example: '{\n  "$schema": "https://json-schema.org/draft/2020-12/schema",\n  "type": "object"\n}',
+        placeholder: '{ "$schema": "https://json-schema.org/draft/2020-12/schema" }'
+    },
+    'sql': {
+        name: 'SQL',
+        description: 'SQL (INSERT/CREATE TABLE simples serão normalizados)',
+        example: 'INSERT INTO users (id,name) VALUES (1,\'John\');',
+        placeholder: 'INSERT INTO ...' 
     }
 }

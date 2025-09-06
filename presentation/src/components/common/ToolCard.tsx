@@ -12,7 +12,7 @@ const iconMap = {
 }
 
 export function ToolCard({ tool, onClick, className }: ToolCardProps) {
-    const Icon = iconMap[tool.icon as keyof typeof iconMap]
+    const Icon = tool.iconComponent || iconMap[tool.icon as keyof typeof iconMap]
 
     const content = (
         <Card className={cn('group cursor-pointer transition-all hover:shadow-lg', className)}>

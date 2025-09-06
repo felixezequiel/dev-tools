@@ -2,35 +2,19 @@ import { motion } from 'framer-motion'
 import { ToolCard } from '@/components/common/ToolCard'
 import { PageHeader } from '@/components/layout/PageHeader'
 import { Badge } from '@/components/ui/Badge'
-import { Zap, Clock, Shield, Sparkles } from 'lucide-react'
+import { Zap, Shield, Sparkles } from 'lucide-react'
+import { acceptedInputTypes, supportedOutputs } from '@/config/supported'
 import type { Tool } from '@/types'
+import { converterConfigs } from '@/config/converters'
 
-const tools: Tool[] = [
-    {
-        id: 'json-converter',
-        name: 'Conversor JSON',
-        description: 'Converte dados estruturados (chave-valor, JSON, CSV) em objetos JSON organizados com validação em tempo real',
-        icon: 'FileText',
-        path: '/json-converter',
-        category: 'converter'
-    },
-    {
-        id: 'csv-converter',
-        name: 'Conversor CSV',
-        description: 'Transforma dados estruturados em arquivos CSV com formatação adequada e escape de caracteres especiais',
-        icon: 'Table',
-        path: '/csv-converter',
-        category: 'converter'
-    },
-    {
-        id: 'formdata-converter',
-        name: 'Conversor FormData',
-        description: 'Converte dados estruturados em FormData para envio de formulários web com preview interativo',
-        icon: 'Database',
-        path: '/formdata-converter',
-        category: 'converter'
-    }
-]
+const tools: Tool[] = Object.entries(converterConfigs).map(([key, cfg]) => ({
+    id: `${key}-converter`,
+    name: cfg.title,
+    description: cfg.description,
+    iconComponent: cfg.icon,
+    path: `/${key}-converter`,
+    category: 'converter'
+}))
 
 const features = [
     {
@@ -47,11 +31,6 @@ const features = [
         icon: Sparkles,
         title: 'Interface Moderna',
         description: 'Design elegante com validação em tempo real e feedback visual inteligente'
-    },
-    {
-        icon: Clock,
-        title: 'Performance Otimizada',
-        description: 'Lazy loading, code splitting e renderização otimizada para máxima eficiência'
     }
 ]
 
@@ -111,6 +90,35 @@ export function HomePage() {
                             <ToolCard tool={tool} />
                         </motion.div>
                     ))}
+                </div>
+            </motion.div>
+
+            {/* Supported Types */}
+            <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.3 }}
+                className="grid gap-6 md:grid-cols-2"
+            >
+                <div className="rounded-lg border p-6 bg-card">
+                    <h3 className="text-lg font-semibold mb-3">Tipos de Entrada Aceitos</h3>
+                    <div className="flex flex-wrap gap-2">
+                        {acceptedInputTypes.map((t) => (
+                            <span key={t.key} className="text-xs px-2 py-1 rounded-md bg-muted">
+                                {t.label}
+                            </span>
+                        ))}
+                    </div>
+                </div>
+                <div className="rounded-lg border p-6 bg-card">
+                    <h3 className="text-lg font-semibold mb-3">Saídas Suportadas</h3>
+                    <div className="flex flex-wrap gap-2">
+                        {supportedOutputs.map((o) => (
+                            <span key={o.key} className="text-xs px-2 py-1 rounded-md bg-muted">
+                                {o.label}
+                            </span>
+                        ))}
+                    </div>
                 </div>
             </motion.div>
 

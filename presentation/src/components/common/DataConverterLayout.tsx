@@ -6,36 +6,21 @@ import { Button } from '@/components/ui/Button'
 import { TextareaWithValidation } from '@/components/ui/TextareaWithValidation'
 import { FileDropzone } from '@/components/common/FileDropzone'
 import { Badge } from '@/components/ui/Badge'
-import { useDataBuilder } from '@/hooks/useDataBuilder'
+import { useConversion } from '@/hooks/useConversion'
 import { useFileUpload } from '@/hooks/useFileUpload'
-import { useValidation, validationRules } from '@/hooks/useValidation'
+import { useInputValidationByType } from '@/hooks/useInputValidation'
 import { createEntrySource, inputFormats } from '@/lib/entrySources'
-import { downloadFile, copyToClipboard } from '@/lib/utils'
-import {
-    FileText,
-    Download,
-    Copy,
-    Check,
-    AlertCircle,
-    Zap,
-    Loader2,
-    Code,
-    Database,
-    Table,
-    Upload
-} from 'lucide-react'
+import type { InputType } from '@/config/data-support'
+import { SyntaxHighlighterWrapper } from '@/components/common/ui/SyntaxHighlighterWrapper'
+// ResultRendererProps é usado apenas para tipos no ResultComponent
+import { InputModeToggle } from '@/components/common/ui/InputModeToggle'
+import { InputTypeButtons } from '@/components/common/ui/InputTypeButtons'
+import { ConverterInfo } from '@/components/common/ConverterInfo'
+import { SectionHeading } from '@/components/common/ui/SectionHeading'
+import type { DataConverterConfig } from '@/types/converter'
+import { FileText, Download, Copy, Check, AlertCircle, Zap, Loader2 } from 'lucide-react'
 
-export interface DataConverterConfig {
-    title: string
-    description: string
-    inputTypes: ('key-value' | 'json' | 'csv')[]
-    defaultInputType: 'key-value' | 'json' | 'csv'
-    outputFormat: 'json' | 'csv' | 'formdata'
-    outputDescription: string
-    acceptedFileTypes: string[]
-    placeholder: string
-    icon: any
-}
+// DataConverterConfig movido para '@/types/converter'
 
 interface DataConverterLayoutProps {
     config: DataConverterConfig
@@ -44,33 +29,18 @@ interface DataConverterLayoutProps {
 
 export function DataConverterLayout({ config, breadcrumbs }: DataConverterLayoutProps) {
     const [input, setInput] = useState('')
-    const [inputType, setInputType] = useState<'key-value' | 'json' | 'csv'>(config.defaultInputType)
+    const [inputType, setInputType] = useState<InputType>(config.defaultInputType)
     const [inputMode, setInputMode] = useState<'manual' | 'file'>('manual')
     const [copied, setCopied] = useState(false)
-
-    const { isBuilding, result, buildFromSource, buildToCsv, buildToFormData } = useDataBuilder()
+    const { isBuilding, result, sqlMode, regenerateSql, copy, download, convert } = useConversion(config)
+    const [version, setVersion] = useState(0)
+    const [updatedAt, setUpdatedAt] = useState<number | null>(null)
+    const [justUpdated, setJustUpdated] = useState(false)
     const { uploadedFile, uploadFile, removeFile } = useFileUpload()
 
-    // Validação baseada no tipo de entrada
-    const getValidationRules = useCallback(() => {
-        switch (inputType) {
-            case 'key-value':
-                return [validationRules.keyValueFormat()]
-            case 'json':
-                return [validationRules.jsonFormat()]
-            case 'csv':
-                return [validationRules.required('Dados CSV')]
-            default:
-                return [validationRules.keyValueFormat()]
-        }
-    }, [inputType])
+    const { validation: inputValidation, validateInput } = useInputValidationByType(inputType)
 
-    const inputValidation = useValidation(getValidationRules())
-
-    // Função de validação em tempo real
-    const validateInput = useCallback((value: string) => {
-        return inputValidation.validateField(value)
-    }, [inputValidation])
+    // validateInput fornecido por hook centralizado
 
     // Handler para mudança de input com validação
     const handleInputChange = useCallback((value: string) => {
@@ -78,7 +48,7 @@ export function DataConverterLayout({ config, breadcrumbs }: DataConverterLayout
     }, [])
 
     // Handler para mudança de tipo de entrada
-    const handleInputTypeChange = useCallback((type: 'key-value' | 'json' | 'csv') => {
+    const handleInputTypeChange = useCallback((type: InputType) => {
         setInputType(type)
         setInput('')
         removeFile()
@@ -100,7 +70,7 @@ export function DataConverterLayout({ config, breadcrumbs }: DataConverterLayout
         if (result.success && result.file) {
             // Auto-detectar tipo baseado na extensão do arquivo
             const extension = file.name.split('.').pop()?.toLowerCase()
-            let detectedType: 'key-value' | 'json' | 'csv' = config.defaultInputType
+            let detectedType: InputType = config.defaultInputType
 
             switch (extension) {
                 case 'json':
@@ -109,6 +79,16 @@ export function DataConverterLayout({ config, breadcrumbs }: DataConverterLayout
                 case 'csv':
                 case 'tsv':
                     if (config.inputTypes.includes('csv')) detectedType = 'csv'
+                    break
+                case 'yaml':
+                case 'yml':
+                    if (config.inputTypes.includes('yaml')) detectedType = 'yaml'
+                    break
+                case 'xml':
+                    if (config.inputTypes.includes('xml')) detectedType = 'xml'
+                    break
+                case 'sql':
+                    if (config.inputTypes.includes('sql')) detectedType = 'sql'
                     break
                 default:
                     detectedType = config.defaultInputType
@@ -130,68 +110,25 @@ export function DataConverterLayout({ config, breadcrumbs }: DataConverterLayout
 
         try {
             const entrySource = createEntrySource(input, inputType)
-
-            switch (config.outputFormat) {
-                case 'json':
-                    await buildFromSource(entrySource)
-                    break
-                case 'csv':
-                    await buildToCsv(entrySource)
-                    break
-                case 'formdata':
-                    await buildToFormData(entrySource)
-                    break
-            }
+            await convert(entrySource)
+            setVersion(v => v + 1)
+            const now = Date.now()
+            setUpdatedAt(now)
+            setJustUpdated(true)
+            setTimeout(() => setJustUpdated(false), 1500)
         } catch (error) {
             console.error('Erro ao criar EntrySource:', error)
         }
     }
 
     const handleCopy = async () => {
-        if (result?.data) {
-            let contentToCopy = result.data
-            if (config.outputFormat === 'formdata' && result.data instanceof FormData) {
-                contentToCopy = Array.from(result.data.entries())
-                    .map(([key, value]) => `${key}=${value}`)
-                    .join('\n')
-            }
-            await copyToClipboard(typeof contentToCopy === 'string' ? contentToCopy : JSON.stringify(contentToCopy, null, 2))
-            setCopied(true)
-            setTimeout(() => setCopied(false), 2000)
-        }
+        await copy()
+        setCopied(true)
+        setTimeout(() => setCopied(false), 2000)
     }
 
     const handleDownload = () => {
-        if (result?.data) {
-            let content = result.data
-            let filename: string
-            let mimeType: string
-
-            switch (config.outputFormat) {
-                case 'json':
-                    content = JSON.stringify(result.data, null, 2)
-                    filename = 'converted-data.json'
-                    mimeType = 'application/json'
-                    break
-                case 'csv':
-                    filename = 'converted-data.csv'
-                    mimeType = 'text/csv'
-                    break
-                case 'formdata':
-                    content = Array.from((result.data as FormData).entries())
-                        .map(([key, value]) => `${key}=${value}`)
-                        .join('\n')
-                    filename = 'converted-data.txt'
-                    mimeType = 'text/plain'
-                    break
-                default:
-                    content = JSON.stringify(result.data, null, 2)
-                    filename = 'converted-data.json'
-                    mimeType = 'application/json'
-            }
-
-            downloadFile(content as string, filename, mimeType)
-        }
+        download()
     }
 
     const getSyntaxHighlighter = () => {
@@ -231,7 +168,7 @@ export function DataConverterLayout({ config, breadcrumbs }: DataConverterLayout
                 breadcrumbs={breadcrumbs}
             />
 
-            <div className="grid gap-6 lg:grid-cols-2">
+            <div className="grid gap-8 lg:grid-cols-2">
                 {/* Input Section */}
                 <motion.div
                     initial={{ opacity: 0, x: -20 }}
@@ -247,117 +184,89 @@ export function DataConverterLayout({ config, breadcrumbs }: DataConverterLayout
                                         <span>Dados de Entrada</span>
                                     </CardTitle>
                                     <CardDescription>
-                                        Selecione o formato e insira os dados para conversão
+                                        Escolha o modo de entrada (Digitar ou Arquivo) e o tipo de formato abaixo para inserir seus dados.
                                     </CardDescription>
+                                    <div className="mt-2">
+                                        <ConverterInfo usage={config.usage} />
+                                    </div>
                                 </div>
                             </div>
                         </CardHeader>
-                        <CardContent className="space-y-4">
-                            {/* Seletor de modo de entrada */}
-                            <div className="flex space-x-2">
-                                <Button
-                                    variant={inputMode === 'manual' ? 'default' : 'outline'}
-                                    size="sm"
-                                    onClick={() => handleInputModeChange('manual')}
-                                    className="flex items-center space-x-1"
-                                >
-                                    <FileText className="h-3 w-3" />
-                                    <span>Digitar</span>
-                                </Button>
-                                <Button
-                                    variant={inputMode === 'file' ? 'default' : 'outline'}
-                                    size="sm"
-                                    onClick={() => handleInputModeChange('file')}
-                                    className="flex items-center space-x-1"
-                                >
-                                    <Upload className="h-3 w-3" />
-                                    <span>Arquivo</span>
-                                </Button>
-                            </div>
-
-                            {/* Seletor de tipo de entrada */}
-                            <div className="flex space-x-2">
-                                {config.inputTypes.map((type) => {
-                                    const format = inputFormats[type]
-                                    return (
-                                        <Button
-                                            key={type}
-                                            variant={inputType === type ? 'default' : 'outline'}
-                                            size="sm"
-                                            onClick={() => handleInputTypeChange(type)}
-                                            className="flex items-center space-x-1"
-                                        >
-                                            {type === 'key-value' && <Code className="h-3 w-3" />}
-                                            {type === 'json' && <Database className="h-3 w-3" />}
-                                            {type === 'csv' && <Table className="h-3 w-3" />}
-                                            <span>{format.name}</span>
-                                        </Button>
-                                    )
-                                })}
-                            </div>
-
-                            {/* Descrição do formato atual */}
-                            <div className="text-sm text-muted-foreground">
-                                <p>{inputFormats[inputType].description}</p>
-                            </div>
-
-                            {inputMode === 'manual' ? (
-                                <>
-                                    <TextareaWithValidation
-                                        placeholder={inputFormats[inputType].placeholder}
-                                        value={input}
-                                        onChange={handleInputChange}
-                                        onValidate={validateInput}
-                                        successMessage="Formato válido"
-                                        className="min-h-[300px] font-mono text-sm"
-                                    />
-
-                                    {/* Botão para carregar exemplo */}
-                                    <Button
-                                        variant="outline"
-                                        size="sm"
-                                        onClick={() => setInput(inputFormats[inputType].example)}
-                                    >
-                                        Carregar Exemplo
-                                    </Button>
-                                </>
-                            ) : (
-                                <FileDropzone
-                                    onFileSelect={handleFileSelect}
-                                    onFileRemove={handleFileRemove}
-                                    acceptedFileTypes={config.acceptedFileTypes}
-                                    placeholder={config.placeholder}
-                                />
-                            )}
-
-                            <div className="flex items-center justify-between">
-                                <div className="text-sm text-muted-foreground">
-                                    {input.split('\n').filter(line => line.trim()).length} linhas
+                        <CardContent>
+                            <div className="space-y-6">
+                                {/* Passo 1: Tipo de entrada */}
+                                <div className="space-y-2">
+                                    <SectionHeading step={1} title="Escolha o tipo de dados" description="Selecione o formato que melhor representa seus dados." />
+                                    <InputTypeButtons allowedTypes={config.inputTypes} current={inputType} onChange={handleInputTypeChange} />
                                 </div>
-                                <Button
-                                    onClick={handleConvert}
-                                    disabled={
-                                        (!input.trim() && !uploadedFile) ||
-                                        isBuilding ||
-                                        (inputMode === 'manual' && inputValidation.hasErrors)
-                                    }
-                                    loading={isBuilding}
-                                    variant={
-                                        (inputMode === 'manual' && inputValidation.hasErrors) ||
-                                            (!input.trim() && !uploadedFile)
-                                            ? "destructive"
-                                            : "default"
-                                    }
-                                >
-                                    <Zap className="mr-2 h-4 w-4" />
-                                    {
-                                        inputMode === 'manual' && inputValidation.hasErrors
-                                            ? "Corrigir Erros"
-                                            : (!input.trim() && !uploadedFile)
-                                                ? "Selecione Dados"
-                                                : `Converter para ${config.outputFormat.toUpperCase()}`
-                                    }
-                                </Button>
+
+                                {/* Passo 2: Modo */}
+                                <div className="space-y-2">
+                                    <SectionHeading step={2} title="Escolha como inserir" description="Digite manualmente ou envie um arquivo." />
+                                    <InputModeToggle mode={inputMode} onChange={handleInputModeChange} />
+                                </div>
+
+                                {/* Dica do formato atual */}
+                                <div className="text-xs text-muted-foreground">
+                                    <p>{inputFormats[inputType].description}</p>
+                                </div>
+
+                                {/* Passo 3: Inserção de dados */}
+                                <div className="space-y-2">
+                                    <SectionHeading step={3} title="Insira os dados" description="Cole ou digite os dados conforme o formato selecionado." />
+                                    {inputMode === 'manual' ? (
+                                        <>
+                                            <TextareaWithValidation
+                                                placeholder={inputFormats[inputType].placeholder}
+                                                value={input}
+                                                onChange={handleInputChange}
+                                                onValidate={validateInput}
+                                                successMessage="Formato válido"
+                                                className="min-h-[300px] font-mono text-sm"
+                                            />
+                                            <Button variant="outline" size="sm" onClick={() => setInput(inputFormats[inputType].example)}>
+                                                Carregar Exemplo
+                                            </Button>
+                                        </>
+                                    ) : (
+                                        <FileDropzone
+                                            onFileSelect={handleFileSelect}
+                                            onFileRemove={handleFileRemove}
+                                            acceptedFileTypes={config.acceptedFileTypes}
+                                            placeholder={config.placeholder}
+                                        />
+                                    )}
+
+                                    <div className="flex items-center justify-between">
+                                        <div className="text-sm text-muted-foreground">
+                                            {input.split('\n').filter(line => line.trim()).length} linhas
+                                        </div>
+                                        <Button
+                                            onClick={handleConvert}
+                                            disabled={
+                                                (!input.trim() && !uploadedFile) ||
+                                                isBuilding ||
+                                                (inputMode === 'manual' && inputValidation.hasErrors)
+                                            }
+                                            loading={isBuilding}
+                                            variant={
+                                                (inputMode === 'manual' && inputValidation.hasErrors) ||
+                                                    (!input.trim() && !uploadedFile)
+                                                    ? "destructive"
+                                                    : "default"
+                                            }
+                                        >
+                                            <Zap className="mr-2 h-4 w-4" />
+                                            {
+                                                inputMode === 'manual' && inputValidation.hasErrors
+                                                    ? "Corrigir Erros"
+                                                    : (!input.trim() && !uploadedFile)
+                                                        ? "Selecione Dados"
+                                                        : `Converter para ${config.outputFormat.toUpperCase()}`
+                                            }
+                                        </Button>
+                                    </div>
+                                </div>
                             </div>
                         </CardContent>
                     </Card>
@@ -397,21 +306,66 @@ export function DataConverterLayout({ config, breadcrumbs }: DataConverterLayout
                                 )}
                             </div>
                         </CardHeader>
-                        <CardContent>
+                        <CardContent className="space-y-4">
                             {result?.success ? (
-                                <div className="space-y-4">
-                                    <div className="flex items-center space-x-2">
-                                        <Badge variant="success">Sucesso</Badge>
-                                        {result.executionTime && (
-                                            <span className="text-sm text-muted-foreground">
-                                                {result.executionTime.toFixed(2)}ms
-                                            </span>
+                                config.ResultComponent ? (
+                                    <config.ResultComponent
+                                        config={config}
+                                        result={result}
+                                        onCopy={handleCopy}
+                                        onDownload={handleDownload}
+                                        input={input}
+                                        inputType={inputType}
+                                        version={version}
+                                        updatedAt={updatedAt}
+                                        justUpdated={justUpdated}
+                                    />
+                                ) : (
+                                    <div className="space-y-4">
+                                        <div className="flex items-center space-x-2">
+                                            <Badge variant="success">Sucesso</Badge>
+                                            {result.executionTime && (
+                                                <span className="text-sm text-muted-foreground">
+                                                    {result.executionTime.toFixed(2)}ms
+                                                </span>
+                                            )}
+                                        </div>
+                                        {config.outputFormat === 'sql' && (
+                                            <div className="flex flex-wrap gap-2">
+                                                <Button
+                                                    variant={sqlMode === 'insert' ? 'default' : 'outline'}
+                                                    size="sm"
+                                                    onClick={async () => {
+                                                        await regenerateSql('insert', createEntrySource(input, inputType))
+                                                    }}
+                                                >
+                                                    INSERT
+                                                </Button>
+                                                <Button
+                                                    variant={sqlMode === 'update' ? 'default' : 'outline'}
+                                                    size="sm"
+                                                    onClick={async () => {
+                                                        await regenerateSql('update', createEntrySource(input, inputType))
+                                                    }}
+                                                >
+                                                    UPDATE
+                                                </Button>
+                                                <Button
+                                                    variant={sqlMode === 'create-table' ? 'default' : 'outline'}
+                                                    size="sm"
+                                                    onClick={async () => {
+                                                        await regenerateSql('create-table', createEntrySource(input, inputType))
+                                                    }}
+                                                >
+                                                CREATE TABLE
+                                                </Button>
+                                            </div>
                                         )}
+                                        <div className="rounded-md border bg-muted/50 p-4">
+                                            {getSyntaxHighlighter()}
+                                        </div>
                                     </div>
-                                    <div className="rounded-md border bg-muted/50 p-4">
-                                        {getSyntaxHighlighter()}
-                                    </div>
-                                </div>
+                                )
                             ) : result?.error ? (
                                 <div className="flex items-center space-x-2 rounded-md border border-destructive/50 bg-destructive/5 p-4">
                                     <AlertCircle className="h-5 w-5 text-destructive" />
@@ -436,11 +390,4 @@ export function DataConverterLayout({ config, breadcrumbs }: DataConverterLayout
     )
 }
 
-// SyntaxHighlighter wrapper (simplified for this component)
-function SyntaxHighlighterWrapper({ code }: { code: string }) {
-    return (
-        <pre className="text-sm font-mono whitespace-pre-wrap overflow-x-auto">
-            {code}
-        </pre>
-    )
-}
+// SyntaxHighlighterWrapper agora vem de '@/components/common/ui/SyntaxHighlighterWrapper'

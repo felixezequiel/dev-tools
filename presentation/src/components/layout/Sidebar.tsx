@@ -10,10 +10,14 @@ import {
     Settings,
     Moon,
     Sun,
-    Monitor
+    Monitor,
+    FileCode,
+    FileJson,
+    FileSpreadsheet
 } from 'lucide-react'
 import { useThemeContext } from '@/components/common/ThemeProvider'
 import type { NavItem } from '@/types'
+import { converterConfigs } from '@/config/converters'
 
 const navigationItems: NavItem[] = [
     {
@@ -21,22 +25,11 @@ const navigationItems: NavItem[] = [
         href: '/',
         icon: 'Home'
     },
-    {
-        title: 'Conversor JSON',
-        href: '/json-converter',
-        icon: 'FileText',
-        badge: 'Novo'
-    },
-    {
-        title: 'Conversor CSV',
-        href: '/csv-converter',
-        icon: 'Table'
-    },
-    {
-        title: 'Conversor FormData',
-        href: '/formdata-converter',
-        icon: 'Database'
-    }
+    ...Object.entries(converterConfigs).map(([key, config]) => ({
+        title: config.title,
+        href: `/${key}-converter`,
+        iconComponent: config.icon
+    }))
 ]
 
 const iconMap = {
@@ -44,7 +37,10 @@ const iconMap = {
     FileText,
     Table,
     Database,
-    Settings
+    Settings,
+    FileCode,
+    FileJson,
+    FileSpreadsheet
 }
 
 interface SidebarProps {
@@ -68,31 +64,48 @@ export function Sidebar({ className }: SidebarProps) {
             </div>
 
             {/* Navigation */}
-            <nav className="flex-1 space-y-1 p-4">
-                {navigationItems.map((item) => {
-                    const Icon = iconMap[item.icon as keyof typeof iconMap]
-                    const isActive = location.pathname === item.href
-
+            <nav className="flex-1 p-4">
+                {(() => {
+                    const homeItem = navigationItems[0]
+                    const toolItems = navigationItems.slice(1)
+                    const HomeIcon = iconMap[homeItem.icon as keyof typeof iconMap]
                     return (
-                        <Link key={item.href} to={item.href}>
-                            <Button
-                                variant={isActive ? 'secondary' : 'ghost'}
-                                className={cn(
-                                    'w-full justify-start',
-                                    isActive && 'bg-sidebar-accent text-sidebar-accent-foreground'
-                                )}
-                            >
-                                {Icon && <Icon className="mr-3 h-4 w-4" />}
-                                {item.title}
-                                {item.badge && (
-                                    <Badge variant="secondary" className="ml-auto">
-                                        {item.badge}
-                                    </Badge>
-                                )}
-                            </Button>
-                        </Link>
+                        <div className="space-y-3">
+                            <Link key={homeItem.href} to={homeItem.href}>
+                                <Button
+                                    variant={location.pathname === homeItem.href ? 'secondary' : 'ghost'}
+                                    className={cn('w-full justify-start min-w-0 h-10 px-4 text-sm gap-3 rounded-md', location.pathname === homeItem.href && 'bg-sidebar-accent text-sidebar-accent-foreground')}
+                                >
+                                    {HomeIcon ? <HomeIcon className="h-4 w-4 flex-shrink-0" /> : <div className="h-4 w-4 flex-shrink-0" />}
+                                    <span className="truncate">{homeItem.title}</span>
+                                </Button>
+                            </Link>
+
+                            <div className="px-2 pt-1 text-[10px] font-medium uppercase tracking-wide text-muted-foreground">Ferramentas</div>
+
+                            <div className="space-y-2">
+                                {toolItems.map((item) => {
+                                    const Icon = (item.iconComponent as any) || iconMap[item.icon as keyof typeof iconMap]
+                                    const isActive = location.pathname === item.href
+                                    return (
+                                        <Link key={item.href} to={item.href}>
+                                            <Button
+                                                variant={isActive ? 'secondary' : 'ghost'}
+                                                className={cn('w-full justify-start min-w-0 h-10 px-4 text-sm gap-3 rounded-md transition-colors', isActive && 'bg-sidebar-accent text-sidebar-accent-foreground')}
+                                            >
+                                                {Icon ? <Icon className="h-4 w-4 flex-shrink-0" /> : <div className="h-4 w-4 flex-shrink-0" />}
+                                                <span className="truncate">{item.title}</span>
+                                                {item.badge && (
+                                                    <Badge variant="secondary" className="ml-auto">{item.badge}</Badge>
+                                                )}
+                                            </Button>
+                                        </Link>
+                                    )
+                                })}
+                            </div>
+                        </div>
                     )
-                })}
+                })()}
             </nav>
 
             {/* Theme Toggle */}
