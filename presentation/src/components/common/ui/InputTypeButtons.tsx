@@ -22,7 +22,7 @@ export function InputTypeButtons({ allowedTypes, current, onChange }: InputTypeB
                         onClick={() => onChange(type)}
                         className="flex items-center space-x-1"
                     >
-                        {type === 'key-value' && <Code className="h-3 w-3" />}
+                        {type === 'formdata' && <Code className="h-3 w-3" />}
                         {type === 'json' && <Database className="h-3 w-3" />}
                         {type === 'csv' && <Table className="h-3 w-3" />}
                         {(type === 'yaml' || type === 'xml' || type === 'openapi' || type === 'json-schema' || type === 'sql') && (

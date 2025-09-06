@@ -167,7 +167,7 @@ export function FormDataConverterLayout({ breadcrumbs }: FormDataConverterLayout
                             <SectionHeading step={1} title="Escolha o tipo de dados" description="Selecione o formato que melhor representa seus dados." />
                             <div className="space-y-2">
                                 <InputTypeButtons
-                                    allowedTypes={['key-value', 'json', 'csv', 'yaml', 'xml', 'openapi', 'json-schema', 'sql'] as any}
+                                    allowedTypes={['formdata', 'json', 'csv', 'yaml', 'xml', 'openapi', 'json-schema', 'sql'] as any}
                                     current={inputType}
                                     onChange={handleInputTypeChange}
                                 />

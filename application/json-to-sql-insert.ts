@@ -23,10 +23,13 @@ export class JsonToSqlInsertBuilder implements JsonOutputBuilder<string> {
     }
 
     build(json: Record<string, any>): string {
-        if (Array.isArray(json)) {
-            return this.buildBulkInsert(json);
+        // Normalize a common case where the input is a single root object, e.g. { "user": { ... } }
+        // In that case we unwrap to use the inner object as the row definition.
+        const normalized = this.unwrapSingleRootObject(json);
+        if (Array.isArray(normalized)) {
+            return this.buildBulkInsert(normalized);
         }
-        return this.buildSingleInsert(json);
+        return this.buildSingleInsert(normalized);
     }
 
     private buildSingleInsert(data: Record<string, any>): string {
@@ -71,6 +74,23 @@ export class JsonToSqlInsertBuilder implements JsonOutputBuilder<string> {
         }
 
         return statements.join('\n');
+    }
+
+    private unwrapSingleRootObject(input: any): any {
+        if (input == null) return input;
+        if (Array.isArray(input)) return input;
+        if (typeof input === 'object') {
+            const keys = Object.keys(input);
+            if (keys.length === 1) {
+                const soleKey = keys[0];
+                const candidate = (input as Record<string, any>)[soleKey];
+                // Only unwrap when the value is a plain object (not array/date/file/etc.)
+                if (candidate && typeof candidate === 'object' && !Array.isArray(candidate) && !(candidate instanceof Date) && !(candidate instanceof File)) {
+                    return candidate;
+                }
+            }
+        }
+        return input;
     }
 
     private formatValue(value: any): string {

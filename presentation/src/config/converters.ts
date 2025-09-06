@@ -8,7 +8,7 @@ export const converterConfigs: Record<string, DataConverterConfig> = {
     json: {
         title: 'Converter para JSON',
         description: 'Converte dados estruturados (chave-valor, JSON, CSV) em objetos JSON organizados com validação em tempo real',
-        inputTypes: ['key-value', 'json', 'csv', 'yaml', 'xml', 'openapi', 'json-schema', 'sql'] as InputType[],
+        inputTypes: ['formdata', 'json', 'csv', 'yaml', 'xml', 'openapi', 'json-schema', 'sql'] as InputType[],
         defaultInputType: 'json' as InputType,
         outputFormat: 'json',
         outputDescription: 'JSON estruturado gerado a partir dos dados de entrada',
@@ -30,7 +30,7 @@ export const converterConfigs: Record<string, DataConverterConfig> = {
     csv: {
         title: 'Converter para CSV',
         description: 'Transforma dados estruturados em arquivos CSV com formatação adequada e escape de caracteres especiais',
-        inputTypes: ['key-value', 'json', 'csv', 'yaml', 'xml', 'openapi', 'json-schema', 'sql'] as InputType[],
+        inputTypes: ['formdata', 'json', 'csv', 'yaml', 'xml', 'openapi', 'json-schema', 'sql'] as InputType[],
         defaultInputType: 'json' as InputType,
         outputFormat: 'csv',
         outputDescription: 'CSV estruturado gerado a partir dos dados de entrada',
@@ -52,7 +52,7 @@ export const converterConfigs: Record<string, DataConverterConfig> = {
     formdata: {
         title: 'Converter para FormData',
         description: 'Converte dados estruturados em FormData para envio de formulários web com preview interativo',
-        inputTypes: ['key-value', 'json', 'csv', 'yaml', 'xml', 'openapi', 'json-schema', 'sql'] as InputType[],
+        inputTypes: ['formdata', 'json', 'csv', 'yaml', 'xml', 'openapi', 'json-schema', 'sql'] as InputType[],
         defaultInputType: 'json' as InputType,
         outputFormat: 'formdata',
         outputDescription: 'FormData estruturado gerado a partir dos dados de entrada',
@@ -75,7 +75,7 @@ export const converterConfigs: Record<string, DataConverterConfig> = {
     xml: {
         title: 'Converter para XML',
         description: 'Transforma dados estruturados em XML com suporte a atributos e hierarquia',
-        inputTypes: ['key-value', 'json', 'csv', 'yaml', 'xml', 'openapi', 'json-schema', 'sql'] as InputType[],
+        inputTypes: ['formdata', 'json', 'csv', 'yaml', 'xml', 'openapi', 'json-schema', 'sql'] as InputType[],
         defaultInputType: 'json' as InputType,
         outputFormat: 'xml',
         outputDescription: 'XML gerado a partir dos dados de entrada',
@@ -97,7 +97,7 @@ export const converterConfigs: Record<string, DataConverterConfig> = {
     yaml: {
         title: 'Converter para YAML',
         description: 'Converte dados para YAML legível para configurações e dados estruturados',
-        inputTypes: ['key-value', 'json', 'csv', 'yaml', 'xml', 'openapi', 'json-schema', 'sql'] as InputType[],
+        inputTypes: ['formdata', 'json', 'csv', 'yaml', 'xml', 'openapi', 'json-schema', 'sql'] as InputType[],
         defaultInputType: 'json' as InputType,
         outputFormat: 'yaml',
         outputDescription: 'YAML gerado a partir dos dados de entrada',
@@ -119,7 +119,7 @@ export const converterConfigs: Record<string, DataConverterConfig> = {
     'json-schema': {
         title: 'Converter para JSON Schema',
         description: 'Gera schemas JSON automaticamente para validação de dados',
-        inputTypes: ['key-value', 'json', 'csv', 'yaml', 'xml', 'openapi', 'json-schema', 'sql'] as InputType[],
+        inputTypes: ['formdata', 'json', 'csv', 'yaml', 'xml', 'openapi', 'json-schema', 'sql'] as InputType[],
         defaultInputType: 'json' as InputType,
         outputFormat: 'json-schema',
         outputDescription: 'JSON Schema baseado nos dados de entrada',
@@ -141,7 +141,7 @@ export const converterConfigs: Record<string, DataConverterConfig> = {
     openapi: {
         title: 'Converter para OpenAPI',
         description: 'Gera especificações OpenAPI a partir de exemplos de dados',
-        inputTypes: ['key-value', 'json', 'csv', 'yaml', 'xml', 'openapi', 'json-schema', 'sql'] as InputType[],
+        inputTypes: ['formdata', 'json', 'csv', 'yaml', 'xml', 'openapi', 'json-schema', 'sql'] as InputType[],
         defaultInputType: 'json' as InputType,
         outputFormat: 'openapi',
         outputDescription: 'OpenAPI Specification (JSON) gerada a partir dos dados',
@@ -163,7 +163,7 @@ export const converterConfigs: Record<string, DataConverterConfig> = {
     sql: {
         title: 'Converter para SQL',
         description: 'Gera scripts SQL (INSERT, UPDATE ou CREATE TABLE)',
-        inputTypes: ['key-value', 'json', 'csv', 'yaml', 'xml', 'openapi', 'json-schema', 'sql'] as InputType[],
+        inputTypes: ['formdata', 'json', 'csv', 'yaml', 'xml', 'openapi', 'json-schema', 'sql'] as InputType[],
         defaultInputType: 'json' as InputType,
         outputFormat: 'sql',
         outputDescription: 'Script SQL gerado a partir dos dados',
@@ -185,7 +185,7 @@ export const converterConfigs: Record<string, DataConverterConfig> = {
     'database-migration': {
         title: 'Converter para Database Migration',
         description: 'Gera scripts de migração (UP/DOWN) com suporte a seed data',
-        inputTypes: ['key-value', 'json', 'csv', 'yaml', 'xml', 'openapi', 'json-schema', 'sql'] as InputType[],
+        inputTypes: ['formdata', 'json', 'csv', 'yaml', 'xml', 'openapi', 'json-schema', 'sql'] as InputType[],
         defaultInputType: 'json' as InputType,
         outputFormat: 'db-migration',
         outputDescription: 'Scripts de migração gerados a partir dos dados',

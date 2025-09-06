@@ -46,9 +46,10 @@ export class ArrayEntrySource<TValue> implements EntrySource<number, TValue> {
 }
 
 // Factory function para criar EntrySource baseada na entrada
-export function createEntrySource(input: string, type: 'key-value' | 'json' | 'csv' | 'yaml' | 'xml' | 'openapi' | 'json-schema' | 'sql' = 'key-value'): EntrySource<any, any> {
+export function createEntrySource(input: string, type: 'formdata' | 'json' | 'csv' | 'yaml' | 'xml' | 'openapi' | 'json-schema' | 'sql' = 'formdata'): EntrySource<any, any> {
     switch (type) {
-        case 'key-value':
+        case 'formdata':
+            // FormData textual input is treated as chave=valor lines
             return createKeyValueEntrySource(input)
         case 'json':
             return createJsonEntrySource(input)
@@ -272,11 +273,11 @@ function createCsvEntrySource(input: string): KeyValuePairsEntrySource {
 
 // Utility functions para diferentes formatos de entrada
 export const inputFormats = {
-    'key-value': {
-        name: 'Chave=Valor',
-        description: 'Formato chave=valor, uma por linha',
-        example: 'user.name=John\nuser.age=30\nuser.email=john@example.com',
-        placeholder: 'user.name=John\nuser.age=30\nuser.email=john@example.com'
+    'formdata': {
+        name: 'FormData',
+        description: 'Texto no formato chave=valor (uma por linha), como campos de FormData',
+        example: 'name=John\nage=30\nemail=john@example.com',
+        placeholder: 'name=John\nage=30\nemail=john@example.com'
     },
     'json': {
         name: 'JSON',

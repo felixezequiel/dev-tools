@@ -5,7 +5,7 @@ import { useValidation, validationRules } from '@/hooks/useValidation'
 export function useInputValidationByType(inputType: InputType) {
     const rules = useMemo(() => {
         switch (inputType) {
-            case 'key-value':
+            case 'formdata':
                 return [validationRules.keyValueFormat()]
             case 'json':
                 return [validationRules.jsonFormat()]
