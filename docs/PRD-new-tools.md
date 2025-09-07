@@ -1,0 +1,206 @@
+## PRD: Novas Ferramentas DevTools
+
+### Status Atual (Resumo)
+- Types/Zod Generator: Domínio, aplicação e UI entregues (/types-zod), com registro centralizado em `presentation/src/config/tools.ts` (Home e Sidebar automáticas).
+- Comparadores: JSON/Text com Monaco Diff integrados; CSV com visualização em tabela.
+- Centralização de ferramentas: Home, Sidebar e Rotas geradas via `devTools`.
+
+### Objetivo
+- Entregar duas novas ferramentas que acelerem o fluxo diário de devs:
+  - JSON ↔ Types/Zod Generator
+  - Mock/Data Generator (a partir de JSON Schema/OpenAPI)
+- Integrar ao padrão atual (DDD, SOLID, testes em tests/, UI/UX e theming existentes).
+
+### Escopo (Fase 1)
+- JSON ↔ Types/Zod Generator
+  - Entrada: JSON (objeto/array)
+  - Saída: TypeScript types/interfaces e schema Zod equivalentes
+  - Opções: strict/loose (required/optional), naming strategy (PascalCase/camelCase), readonly, nullable handling, enums/union inferidos
+  - Ações: visualizar no Monaco, copiar, download .ts
+- Mock/Data Generator
+  - Entrada: JSON Schema (2020-12) ou OpenAPI 3.x
+  - Saída: JSON (N itens), CSV (N itens), SQL (INSERT com batch)
+  - Opções: quantidade (N), seed determinístico, locale (pt-BR/en), coerção de formatos (email, uuid, url, date-time)
+  - Ações: visualizar (JSON editor; CSV tabela/Bruto; SQL Monaco), copiar, download
+
+### Métricas de Sucesso
+- 95%+ das conversões geram tipos/schemas válidos sem ajustes manuais
+- Geração de 1k mocks < 1s em máquina padrão
+- Uso recorrente interno (>50% semanal)
+- Zero vazamento de dados (processamento local)
+
+### Restrições e Padrões
+- Arquitetura DDD: ports no domínio; implementações na infraestrutura; composição na aplicação; UI na presentation
+- Testes em tests/ espelhando estrutura; execução com pnpm
+- UI consistente com branding atual; Monaco Editor (vs-dark/vs-light)
+- Nomes declarativos e claros
+
+### Requisitos Funcionais
+- JSON ↔ Types/Zod
+  - RF1: Gerar type/interface TS a partir de JSON
+  - RF2: Gerar z.object recursivo; arrays; unions; enums por repetição de strings
+  - RF3: Flags: optional vs required; readonly; naming strategy; nullable; additionalProperties
+  - RF4: Preview em Monaco (TS/Zod) + copiar/baixar
+  - RF5: Validar JSON e apontar erros amigáveis
+- Mock/Data Generator
+  - RF6: Aceitar JSON Schema/OpenAPI; converter OpenAPI → schema interno
+  - RF7: Gerar N instâncias (seedável) coerentes com tipos/formatos
+  - RF8: Exportar JSON/CSV/SQL (INSERT batchSize configurável)
+  - RF9: Preview (JSON editor; CSV tabela/Bruto; SQL editor) + copiar/baixar
+  - RF10: Validar schema e exibir mensagens amigáveis
+
+### Requisitos Não Funcionais
+- Performance: 1k registros JSON < 1s; CSV/SQL < 2s
+- A11y: foco/atalhos/copy; contraste
+- I18n: PT-BR (como atual)
+- Segurança: offline; sem chamadas externas
+- DX: portas bem definidas; cobertura de testes
+
+### Domínio (Ports/Contratos)
+- JSON ↔ Types/Zod
+  - TypeModelBuilder (AST de tipos a partir de JSON)
+  - ZodSchemaBuilder (AST de zod)
+  - TypeScriptEmitter (AST → string .ts)
+  - ZodEmitter (AST → string .ts)
+- Mock/Data
+  - SchemaLoader (JsonSchema/OpenAPI → InternalSchema)
+  - DataFaker (InternalSchema, seed, locale → objetos)
+  - CsvExporter (objs → CSV)
+  - SqlInsertExporter (objs → SQL; options)
+
+### Aplicação
+- Services/fachadas:
+  - TypesGeneratorService (TypeModelBuilder + Emitters)
+  - MockDataService (SchemaLoader + DataFaker + Exporters)
+
+### Infraestrutura
+- Implementações:
+  - DefaultTypeModelBuilder, DefaultZodSchemaBuilder
+  - DefaultTypeScriptEmitter, DefaultZodEmitter
+  - OpenApiToSchemaConverter, JsonSchemaValidator
+  - FakerDataGenerator (faker-js/seed)
+  - DefaultCsvExporter, DefaultSqlInsertExporter
+
+### Presentation (UX)
+- Rotas
+  - /types-zod: Editor JSON (esq.), opções (meio), saída (tabs TS/Zod) em Monaco
+  - /mock-data: Editor schema/import (esq.), opções (meio), saída (tabs JSON/CSV/SQL) com tabela para CSV
+- Sidebar
+  - Seção “Geradores”: “Types/Zod”, “Mock Data”
+
+### Modelagem (alto nível)
+- InternalSchema: type, properties, format, enum, items, nullable, constraints
+- TypeModel AST: object/interface, property, array, union, enum
+- Zod AST: z.object/z.string/z.number/z.union/z.enum etc.
+
+### Casos de Borda
+- JSON heterogêneo (unions)
+- Arrays vazios (inferência desconhecida)
+- Strings date vs texto livre
+- OpenAPI com $ref/anyOf/allOf (resolver refs; simplificar v1)
+
+### Telemetria (opcional v1)
+- Eventos locais: generate_success/fail, copy, download, N, seed, duração
+
+### Plano de Entrega
+- Semana 1: Domínio/ports + impl mínima Types/Zod; UI básica /types-zod; testes [CONCLUÍDO]
+- Semana 2: Mock/Data domínio + faker infra + exporters; UI /mock-data; CSV tabela; testes [EM ANDAMENTO]
+- Semana 3: Refinos (enums/union heurísticas), performance, documentação
+
+### Riscos/Mitigação
+- Inferência ambígua → flags/overrides na UI
+- OpenAPI complexo → reduzir escopo v1; priorizar schemas simples
+- Performance para N grande → paginação/streaming e batchSize
+
+### Perguntas em Aberto
+- Suporte “TS → Zod” na v1?
+- Limite máximo de N (sugerido: 5000 com aviso)?
+- Padrões de nomes (prefixos/sufixos) e zip multi-arquivos no download?
+
+---
+
+## Ferramentas Futuras (Backlog Detalhado)
+
+### 1) JWT/Encoding Toolkit
+Objetivo: inspecionar/validar tokens e realizar encodes/decodes comuns do dia a dia.
+
+- Funcionalidades
+  - Decoder/inspector de JWT (header/payload/assinatura), verificação HS/RS (chave/PEM fornecidos localmente)
+  - Base64/Base64Url encode/decode; URL encode/decode; Hex/Binary
+  - UUID/ULID gerar/validar
+- Domínio (ports)
+  - JwtVerifier (verify/decode)
+  - EncoderDecoder (string ↔ encodes)
+  - IdGenerator (uuid/ulid)
+- UI/UX
+  - Monaco para JSON do payload, feedback de validade, alertas de expiração/nbf/iat
+  - Botões copiar/baixar; nada sai do client
+
+### 2) Regex Lab
+Objetivo: testar regex rapidamente com visualização de matches e groups.
+
+- Funcionalidades
+  - Suporte a flags (g,i,m,s,u)
+  - Destaque de matches e capture groups no texto
+  - “Explicar regex” curta (heurística) e snippets comuns
+- Domínio (ports)
+  - RegexEngine (match, groups, replace preview)
+- UI/UX
+  - Editor de padrão e texto (Monaco); painel com matches/gps; copiar resultado
+
+### 3) .env Manager
+Objetivo: ajudar a padronizar e auditar arquivos .env.
+
+- Funcionalidades
+  - Diff/merge entre 2+.env; detectar duplicatas/ausentes; normalizar ordem e comentários
+  - Detecção de possíveis segredos expostos (heurística) e dicas de boas práticas
+- Domínio (ports)
+  - EnvParser (parse/serialize)
+  - EnvDiffer (diff/merge rules)
+- UI/UX
+  - Tabela de chaves/valores (com alerta), exportar .env normalizado, copiar
+
+### 4) JSON Patch Lab
+Objetivo: gerar/aplicar patches (RFC 6902) e merge patch, com visualização.
+
+- Funcionalidades
+  - Gerar JSON Patch entre A e B
+  - Aplicar patch e visualizar resultado e erros por operação
+- Domínio (ports)
+  - JsonPatchGenerator (diff → ops)
+  - JsonPatchApplier (apply)
+- UI/UX
+  - Três editores: origem, patch/gerado, destino; diff inline opcional
+
+### 5) Datas/Timezone/Cron
+Objetivo: utilitários comuns de datas e agendamento.
+
+- Funcionalidades
+  - Conversor epoch ↔ humana (com TZ)
+  - Conversor de timezones (exibir múltiplas TZ lado a lado)
+  - Parser de cron (próximas N execuções + timeline)
+- Domínio (ports)
+  - TimeConverter (epoch/TZ)
+  - CronParser (next runs)
+- UI/UX
+  - Pequenos widgets com copy; escolha de locale/TZ
+
+### 6) SQL Formatter/Beautifier (Observação de Integração)
+Objetivo: padronizar formatação SQL e concentrar a lógica em um único ponto do sistema.
+
+- Diretriz de Integração
+  - Centralizar o formatador SQL em um serviço compartilhado, reutilizado por:
+    - Conversor para SQL (INSERT/UPDATE/CREATE TABLE)
+    - Mock/Data Generator (saída SQL)
+    - Ferramenta dedicada de “SQL Formatter”
+  - Isso evita divergência de estilos e mantém a experiência consistente
+- Funcionalidades
+  - Formatador com opções (quote identifiers, upper/lower keywords, indent size)
+  - Linter básico (quebras de linha, trailing commas conforme dialeto suportado)
+- Domínio (ports)
+  - SqlFormatter (format(sql, options))
+- UI/UX
+  - Editor Monaco com preview e copiar/baixar; pode conviver dentro das telas que já exibem SQL
+
+
+

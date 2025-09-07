@@ -5,28 +5,17 @@ import { Badge } from '@/components/ui/Badge'
 import { Zap, Shield, Sparkles } from 'lucide-react'
 import { acceptedInputTypes, supportedOutputs } from '@/config/supported'
 import type { Tool } from '@/types'
-import { converterConfigs } from '@/config/converters'
+import { devTools } from '@/config/tools'
 
-const tools: Tool[] = Object.entries(converterConfigs).map(([key, cfg]) => ({
-    id: `${key}-converter`,
-    name: cfg.title,
-    description: cfg.description,
-    iconComponent: cfg.icon,
-    path: `/${key}-converter`,
-    category: 'converter'
+const allTools: Tool[] = devTools.map(t => ({
+    id: t.id,
+    name: t.name,
+    description: t.description,
+    iconComponent: t.icon,
+    path: t.path,
+    // map categories to existing Tool type categories for badge display
+    category: t.category === 'converter' ? 'converter' : t.category === 'generator' ? 'formatter' : 'validator'
 }))
-
-// Add comparator tool
-const comparatorTool: Tool = {
-    id: 'comparator',
-    name: 'Comparador de Dados',
-    description: 'Compare JSON e texto, detectando caracteres invisíveis',
-    iconComponent: Sparkles,
-    path: '/comparator',
-    category: 'validator'
-}
-
-const allTools: Tool[] = [...tools, comparatorTool]
 
 const features = [
     {

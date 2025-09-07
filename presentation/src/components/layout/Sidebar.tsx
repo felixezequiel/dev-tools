@@ -5,6 +5,7 @@ import { useState } from 'react'
 import { Home, FileText, Moon, Sun, Monitor, ChevronDown } from 'lucide-react'
 import { useThemeContext } from '@/components/common/ThemeProvider'
 import { converterConfigs } from '@/config/converters'
+import { devTools } from '@/config/tools'
 
 const homeNav = { title: 'Página Inicial', href: '/', Icon: Home }
 
@@ -15,7 +16,7 @@ interface SidebarProps {
 export function Sidebar({ className }: SidebarProps) {
     const location = useLocation()
     const { theme, setThemeMode } = useThemeContext()
-    const [open, setOpen] = useState<{ converters: boolean; comparators: boolean }>({ converters: true, comparators: false })
+    const [open, setOpen] = useState<{ converters: boolean; comparators: boolean; generators: boolean }>({ converters: true, comparators: false, generators: true })
 
     return (
         <div className={cn('flex h-full flex-col bg-sidebar border-r', className)}>
@@ -101,6 +102,36 @@ export function Sidebar({ className }: SidebarProps) {
                                     </Link>
                                 )
                             })()}
+                        </div>
+                    </div>
+
+                    {/* Geradores (Accordion) */}
+                    <div className="space-y-1">
+                        <Button
+                            variant="ghost"
+                            className="w-full justify-between min-w-0 h-8 px-2 text-xs rounded-md"
+                            onClick={() => setOpen(state => ({ ...state, generators: !state.generators }))}
+                        >
+                            <span className="font-medium text-muted-foreground">Geradores</span>
+                            <ChevronDown className={cn('h-4 w-4 transition-transform', open.generators ? 'rotate-180' : 'rotate-0')} />
+                        </Button>
+                        <div className={cn('mt-1 space-y-1 pl-2', !open.generators && 'hidden')}>
+                            {devTools.filter(t => t.category === 'generator').map(t => {
+                                const href = t.path
+                                const isActive = location.pathname === href
+                                const Icon = t.icon
+                                return (
+                                    <Link key={t.id} to={href}>
+                                        <Button
+                                            variant={isActive ? 'secondary' : 'ghost'}
+                                            className={cn('w-full justify-start min-w-0 h-9 px-3 text-sm gap-3 rounded-md transition-colors', isActive && 'bg-sidebar-accent text-sidebar-accent-foreground')}
+                                        >
+                                            {Icon ? <Icon className="h-4 w-4 flex-shrink-0" /> : <div className="h-4 w-4 flex-shrink-0" />}
+                                            <span className="truncate">{t.name}</span>
+                                        </Button>
+                                    </Link>
+                                )
+                            })}
                         </div>
                     </div>
                 </div>

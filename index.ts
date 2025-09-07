@@ -8,6 +8,12 @@ export * from './core/domain/ports/json-output-builder';
 export * from './core/domain/ports/json-serializer';
 export * from './core/domain/ports/diff';
 export * from './core/domain/converters/curl-parser';
+// Types/Zod generation
+export * from './core/domain/ports/types-model';
+export * from './core/domain/builders/default-type-model-builder';
+export * from './core/domain/emitters/typescript-emitter';
+export * from './core/domain/emitters/zod-emitter';
+export * from './core/application/types-generator-service';
 export * from './core/domain/comparators/json-comparator';
 export * from './core/domain/comparators/text-comparator';
 
