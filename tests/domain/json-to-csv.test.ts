@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { JsonToCsvBuilder } from '../../core/domain/json-to-csv';
+import { JsonToCsvBuilder } from '../../core/domain/converters/json-to-csv';
 import { DotBracketKeyPathFormatter } from '../../core/infrastructure/key-path/dot-bracket-key-path-formatter';
 import { DefaultJsonToFormDataSerializer } from '../../core/infrastructure/json/default-json-to-formdata-serializer';
 import { DefaultCsvFieldEscaper } from '../../core/infrastructure/csv/csv-escaper';

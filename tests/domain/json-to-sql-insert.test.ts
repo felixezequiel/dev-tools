@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { JsonToSqlInsertBuilder } from '../../core/domain/json-to-sql-insert';
+import { JsonToSqlInsertBuilder } from '../../core/domain/converters/json-to-sql-insert';
 import { DefaultJsonToFormDataSerializer } from '../../core/infrastructure/json/default-json-to-formdata-serializer';
 
 describe('JsonToSqlInsertBuilder', () => {

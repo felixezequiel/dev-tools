@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { JsonToYamlBuilder } from '../../core/domain/json-to-yaml';
+import { JsonToYamlBuilder } from '../../core/domain/converters/json-to-yaml';
 import { DefaultJsonToFormDataSerializer } from '../../core/infrastructure/json/default-json-to-formdata-serializer';
 
 describe('JsonToYamlBuilder', () => {

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { EntrySourceToJsonConverter } from '../../core/domain/entry-source-to-json-converter';
+import { EntrySourceToJsonConverter } from '../../core/domain/converters/entry-source-to-json-converter';
 import { DotBracketKeyPathParser } from '../../core/infrastructure/key-path/dot-bracket-key-path-parser';
 import { LiteralStringValueCoercer } from '../../core/infrastructure/value-coercers/literal-string-value-coercer';
 import { NestedPathStructureMutator } from '../../core/infrastructure/structure-mutators/nested-path-structure-mutator';

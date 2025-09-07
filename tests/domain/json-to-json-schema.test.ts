@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { JsonToJsonSchemaBuilder } from '../../core/domain/json-to-json-schema';
+import { JsonToJsonSchemaBuilder } from '../../core/domain/converters/json-to-json-schema';
 import { DefaultJsonToFormDataSerializer } from '../../core/infrastructure/json/default-json-to-formdata-serializer';
 
 describe('JsonToJsonSchemaBuilder', () => {

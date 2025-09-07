@@ -1,7 +1,7 @@
-import { EntrySource } from '../interfaces/entry-source';
-import { KeyPathParser } from '../interfaces/key-path-parser';
-import { ValueCoercer } from '../interfaces/value-coercer';
-import { StructureMutator } from '../interfaces/structure-mutator';
+import { EntrySource } from '../../interfaces/entry-source';
+import { KeyPathParser } from '../../interfaces/key-path-parser';
+import { ValueCoercer } from '../../interfaces/value-coercer';
+import { StructureMutator } from '../../interfaces/structure-mutator';
 
 export class EntrySourceToJsonConverter {
     private readonly parser: KeyPathParser;

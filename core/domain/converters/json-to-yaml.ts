@@ -1,5 +1,5 @@
-import { JsonOutputBuilder } from './ports/json-output-builder';
-import { JsonSerializer } from './ports/json-serializer';
+import { JsonOutputBuilder } from '../ports/json-output-builder';
+import { JsonSerializer } from '../ports/json-serializer';
 
 export interface YamlOptions {
     indent?: number;

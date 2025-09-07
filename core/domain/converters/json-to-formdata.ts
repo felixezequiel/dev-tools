@@ -1,6 +1,6 @@
-import { KeyPathFormatter } from '../interfaces/key-path-formatter';
-import { JsonSerializer } from './ports/json-serializer';
-import { JsonOutputBuilder } from './ports/json-output-builder';
+import { KeyPathFormatter } from '../../interfaces/key-path-formatter';
+import { JsonSerializer } from '../ports/json-serializer';
+import { JsonOutputBuilder } from '../ports/json-output-builder';
 
 export class JsonToFormDataBuilder implements JsonOutputBuilder<FormData> {
     private readonly formatter: KeyPathFormatter;

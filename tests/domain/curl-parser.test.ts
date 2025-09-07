@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { parseCurlToJson } from '../../core/domain/curl-parser';
+import { parseCurlToJson } from '../../core/domain/converters/curl-parser';
 
 describe('parseCurlToJson', () => {
     it('parses basic GET', () => {

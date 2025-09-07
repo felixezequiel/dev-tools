@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { JsonToSqlCreateTableBuilder } from '../../core/domain/json-to-sql-create-table';
+import { JsonToSqlCreateTableBuilder } from '../../core/domain/converters/json-to-sql-create-table';
 
 describe('JsonToSqlCreateTableBuilder', () => {
     it('builds create table from simple object', () => {

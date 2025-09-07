@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { JsonToOpenApiBuilder } from '../../core/domain/json-to-openapi';
+import { JsonToOpenApiBuilder } from '../../core/domain/converters/json-to-openapi';
 import { DefaultJsonToFormDataSerializer } from '../../core/infrastructure/json/default-json-to-formdata-serializer';
 
 describe('JsonToOpenApiBuilder', () => {

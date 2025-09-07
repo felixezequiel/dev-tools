@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { JsonToDatabaseMigrationBuilder } from '../../core/domain/json-to-database-migration';
+import { JsonToDatabaseMigrationBuilder } from '../../core/domain/converters/json-to-database-migration';
 import { DefaultJsonToFormDataSerializer } from '../../core/infrastructure/json/default-json-to-formdata-serializer';
 
 describe('JsonToDatabaseMigrationBuilder', () => {

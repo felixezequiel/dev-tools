@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { JsonToXmlBuilder } from '../../core/domain/json-to-xml';
+import { JsonToXmlBuilder } from '../../core/domain/converters/json-to-xml';
 import { DefaultJsonToFormDataSerializer } from '../../core/infrastructure/json/default-json-to-formdata-serializer';
 
 describe('JsonToXmlBuilder', () => {

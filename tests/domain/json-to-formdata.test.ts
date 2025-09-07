@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { JsonToFormDataBuilder } from '../../core/domain/json-to-formdata';
+import { JsonToFormDataBuilder } from '../../core/domain/converters/json-to-formdata';
 import { DotBracketKeyPathFormatter } from '../../core/infrastructure/key-path/dot-bracket-key-path-formatter';
 import { DefaultJsonToFormDataSerializer } from '../../core/infrastructure/json/default-json-to-formdata-serializer';
 
