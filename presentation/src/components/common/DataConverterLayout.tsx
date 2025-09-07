@@ -5,6 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/Button'
 import { TextareaWithValidation } from '@/components/ui/TextareaWithValidation'
 import { CodeEditor } from '@/components/common/ui/CodeEditor'
+import { SqlResult } from '@/components/common/results/SqlResult'
 import { FileDropzone } from '@/components/common/FileDropzone'
 import { Badge } from '@/components/ui/Badge'
 import { useConversion } from '@/hooks/useConversion'
@@ -271,7 +272,7 @@ export function DataConverterLayout({ config, breadcrumbs }: DataConverterLayout
                                         {config.outputDescription}
                                     </CardDescription>
                                 </div>
-                                {result?.success && !config.ResultComponent && (
+                                {result?.success && !config.ResultComponent && !(config.outputFormat === 'sql' || config.outputFormat === 'sql-insert' || config.outputFormat === 'sql-update' || config.outputFormat === 'sql-create-table') && (
                                     <div className="flex space-x-2">
                                         <Button variant="outline" size="sm" onClick={handleCopy}>
                                             {copied ? (
@@ -303,14 +304,16 @@ export function DataConverterLayout({ config, breadcrumbs }: DataConverterLayout
                                     />
                                 ) : (
                                     <div className="space-y-4">
-                                        <div className="flex items-center space-x-2">
-                                            <Badge variant="success">Sucesso</Badge>
-                                            {result.executionTime && (
-                                                <span className="text-sm text-muted-foreground">
-                                                    {result.executionTime.toFixed(2)}ms
-                                                </span>
-                                            )}
-                                        </div>
+                                        {!(config.outputFormat === 'sql' || config.outputFormat === 'sql-insert' || config.outputFormat === 'sql-update' || config.outputFormat === 'sql-create-table') && (
+                                            <div className="flex items-center space-x-2">
+                                                <Badge variant="success">Sucesso</Badge>
+                                                {result.executionTime && (
+                                                    <span className="text-sm text-muted-foreground">
+                                                        {result.executionTime.toFixed(2)}ms
+                                                    </span>
+                                                )}
+                                            </div>
+                                        )}
                                         {config.outputFormat === 'sql' && (
                                             <div className="flex flex-wrap gap-2">
                                                 <Button
@@ -355,6 +358,19 @@ export function DataConverterLayout({ config, breadcrumbs }: DataConverterLayout
                                                 if (config.outputFormat === 'xml') {
                                                     const code = typeof result?.data === 'string' ? result.data : String(result?.data ?? '')
                                                     return <CodeEditor value={code} onChange={() => {}} readOnly language="xml" height={360} />
+                                                }
+                                                if (config.outputFormat === 'sql' || config.outputFormat === 'sql-insert' || config.outputFormat === 'sql-update' || config.outputFormat === 'sql-create-table') {
+                                                    return (
+                                                        <SqlResult
+                                                            config={config}
+                                                            result={result}
+                                                            onCopy={handleCopy}
+                                                            onDownload={handleDownload}
+                                                            version={version}
+                                                            updatedAt={updatedAt}
+                                                            justUpdated={justUpdated}
+                                                        />
+                                                    )
                                                 }
                                                 const code = typeof result?.data === 'string' ? result.data : JSON.stringify(result?.data ?? {}, null, 2)
                                                 return <CodeEditor value={code} onChange={() => {}} readOnly language="plaintext" height={360} />
