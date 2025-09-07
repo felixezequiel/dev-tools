@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { JsonDataEntrySource } from '../../../infrastructure/entry-sources/json-data-entry-source';
+import { JsonDataEntrySource } from '../../../core/infrastructure/entry-sources/json-data-entry-source';
 
 describe('JsonDataEntrySource', () => {
     it('emits flattened entries from json', () => {

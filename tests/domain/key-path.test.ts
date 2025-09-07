@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { KeyPath } from '../../domain/key-path';
+import { KeyPath } from '../../core/domain/ports/key-path';
 
 describe('KeyPath', () => {
     it('exposes segments and helpers', () => {

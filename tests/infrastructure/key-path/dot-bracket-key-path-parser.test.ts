@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { DotBracketKeyPathParser } from '../../../infrastructure/key-path/dot-bracket-key-path-parser';
+import { DotBracketKeyPathParser } from '../../../core/infrastructure/key-path/dot-bracket-key-path-parser';
 
 describe('DotBracketKeyPathParser', () => {
     it('parses dot+bracket syntax into segments', () => {

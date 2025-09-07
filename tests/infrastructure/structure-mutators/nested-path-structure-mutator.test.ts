@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
-import { NestedPathStructureMutator } from '../../../infrastructure/structure-mutators/nested-path-structure-mutator';
-import { KeyPath } from '../../../domain/key-path';
-import { LiteralStringValueCoercer } from '../../../infrastructure/value-coercers/literal-string-value-coercer';
+import { NestedPathStructureMutator } from '../../../core/infrastructure/structure-mutators/nested-path-structure-mutator';
+import { KeyPath } from '../../../core/domain/ports/key-path';
+import { LiteralStringValueCoercer } from '../../../core/infrastructure/value-coercers/literal-string-value-coercer';
 
 describe('NestedPathStructureMutator', () => {
   it('sets values for object and array paths', () => {

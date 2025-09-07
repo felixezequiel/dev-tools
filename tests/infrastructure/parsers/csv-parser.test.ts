@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { DefaultCsvParser } from '../../../infrastructure/parsers/csv-parser';
+import { DefaultCsvParser } from '../../../core/infrastructure/parsers/csv-parser';
 
 describe('DefaultCsvParser', () => {
   it('parses simple csv with quotes', () => {

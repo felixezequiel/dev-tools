@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { FormDataEntrySource } from '../../../infrastructure/entry-sources/formdata-entry-source';
+import { FormDataEntrySource } from '../../../core/infrastructure/entry-sources/formdata-entry-source';
 
 describe('FormDataEntrySource', () => {
   it('wraps FormData entries()', () => {
