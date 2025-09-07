@@ -107,6 +107,79 @@
 - Semana 2: Mock/Data domínio + faker infra + exporters; UI /mock-data; CSV tabela; testes [EM ANDAMENTO]
 - Semana 3: Refinos (enums/union heurísticas), performance, documentação
 
+### Semana 2 – Mock/Data Generator (Detalhamento)
+
+#### Requisitos Funcionais (RF)
+- RF-M1: Importar JSON Schema 2020-12 (arquivo/cola) e validar schema (feedback inline).
+- RF-M2: Importar OpenAPI 3.x (arquivo/cola) e converter para InternalSchema.
+- RF-M3: Gerar N itens determinísticos (seed) com coerção por format (email, uuid, url, date, date-time) e locale.
+- RF-M4: Saídas suportadas: JSON (array), CSV (tabela/monaco bruto), SQL INSERT (batchSize, tableName); copiar/baixar.
+- RF-M5: Opções: seed, N (limite sugerido 5000 com aviso), locale, batchSize, tableName, includeNulls.
+- RF-M6: UI com 3 áreas: Schema/Spec (esq), Opções (meio), Saída (dir) com tabs JSON/CSV/SQL.
+
+#### Domínio (Ports/Contratos)
+- `SchemaLoader`:
+  - `loadFromJsonSchema(input: unknown): InternalSchema`
+  - `loadFromOpenApi(spec: unknown): InternalSchema`
+- `DataFaker`:
+  - `generate(schema: InternalSchema, options: { count: number; seed?: string; locale?: string }): any[]`
+- `CsvExporter`:
+  - `export(rows: Record<string, any>[], options?: { delimiter?: string; header?: boolean }): string`
+- `SqlInsertExporter`:
+  - `export(rows: Record<string, any>[], options: { tableName: string; includeNulls?: boolean; batchSize?: number }): string`
+
+`InternalSchema` (alto nível): `{ type: 'object'|'array'|'string'|'number'|'boolean'|'null'; properties?; items?; enum?; format?; required?; nullable? }`
+
+#### Infraestrutura (Implementações)
+- `OpenApiToSchemaConverter`: resolve $ref locais, simplifica anyOf/allOf/oneOf (v1: prioriza o primeiro válido), extrai component schemas.
+- `JsonSchemaValidator`: valida entrada e gera erros amigáveis (linha/coluna quando possível).
+- `FakerDataGenerator`: usa faker-js (locale), seedrandom (seed), e heurísticas por format; objetos recursivos, arrays com tamanho padrão (ex.: 1-3) configurável.
+- `DefaultCsvExporter`: reaproveita `JsonToCsvBuilder` quando possível; aceita delimitador ',' e header on/off.
+- `DefaultSqlInsertExporter`: reaproveita `JsonToSqlInsertBuilder` com normalização de linhas/batches.
+
+#### Aplicação
+- `MockDataService`
+  - `generateFromJsonSchema(schema: unknown, options): { json: any[]; csv: string; sql: string }`
+  - `generateFromOpenApi(spec: unknown, options): idem`
+  - Composição de loaders + faker + exporters; tratamento central de erros.
+
+#### UI/UX (Presentation)
+- Rota: `/mock-data` registrada via `devTools`.
+- Coluna esquerda: Monaco editor com seletor (JSON Schema | OpenAPI), botão Validar.
+- Coluna central: Opções (seed, N, locale, batchSize, tableName, includeNulls).
+- Coluna direita: Tabs JSON/CSV/SQL
+  - JSON: CodeEditor read-only.
+  - CSV: `CsvResult` (Tabela/Bruto) com copiar/baixar.
+  - SQL: CodeEditor read-only com copiar/baixar.
+- Mensagens de erro compactas sob cada área.
+
+#### Aceitação/Qualidade
+- AC-M1: Dado um schema simples, gerar 1000 itens em < 1s (máquina padrão local).
+- AC-M2: Alterando seed, trocam os valores; com mesma seed, reprodutível.
+- AC-M3: CSV primeira linha = cabeçalho, com delimitador ",", escapando campos.
+- AC-M4: SQL respeita `batchSize` e `includeNulls`, com escaping de aspas.
+- AC-M5: OpenAPI mínima com schema de request/response gera `InternalSchema` válido.
+
+#### Testes (tests/)
+- `tests/domain/mock-data/`:
+  - loader-json-schema: propriedades básicas, enum, required, nullable.
+  - loader-openapi: components simples, $ref local, formatos comuns.
+  - data-faker: seed/locale, formatos, arrays/objetos aninhados.
+  - exporters: CSV com header/escape, SQL com batch/identificadores.
+
+#### Tarefas (Implementação v1)
+1) Domínio: criar ports `SchemaLoader`, `DataFaker`, `CsvExporter`, `SqlInsertExporter`.
+2) Infra: `OpenApiToSchemaConverter`, `JsonSchemaValidator`, `FakerDataGenerator`, `DefaultCsvExporter`, `DefaultSqlInsertExporter`.
+3) Aplicação: `MockDataService` (composição e orquestração).
+4) Presentation: página `/mock-data`, registro em `devTools`, UI de opções/tabs, integração com `CsvResult`.
+5) Testes: cobrir casos descritos; smoke de performance (tempo medido em teste não-bloqueante).
+6) Documentação: ajuda inline (tooltips) e exemplos de schema/spec.
+
+#### Riscos e Mitigações Específicas
+- Esquemas OpenAPI complexos: limitar v1 a refs locais e objetos planos/moderadamente aninhados; logar limitações.
+- Geração muito grande (N alto): exibir aviso e paginar/streamar quando N > 5000.
+- Locale/faker: fallback para en caso de locale inválido.
+
 ### Riscos/Mitigação
 - Inferência ambígua → flags/overrides na UI
 - OpenAPI complexo → reduzir escopo v1; priorizar schemas simples

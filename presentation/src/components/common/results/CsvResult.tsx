@@ -5,9 +5,10 @@ import { Badge } from '@/components/ui/Badge'
 import { DefaultCsvParser } from '@builder/data'
 import { CodeEditor } from '@/components/common/ui/CodeEditor'
 import type { ResultRendererProps } from '@/types/converter'
+type CsvProps = Omit<ResultRendererProps, 'config' | 'input' | 'inputType'>
 import { Check, Copy, Download, Eye, EyeOff } from 'lucide-react'
 
-export function CsvResult({ result, onCopy, onDownload, version, updatedAt, justUpdated }: ResultRendererProps) {
+export function CsvResult({ result, onCopy, onDownload, version, updatedAt, justUpdated }: CsvProps) {
     const [view, setView] = useState<'table' | 'raw'>('table')
     const [copied, setCopied] = useState(false)
 

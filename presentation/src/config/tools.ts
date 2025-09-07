@@ -1,4 +1,4 @@
-import type { ComponentType, LazyExoticComponent } from 'react'
+import type { ComponentType } from 'react'
 import { converterConfigs } from '@/config/converters'
 import { Sparkles, FileText } from 'lucide-react'
 
@@ -43,10 +43,21 @@ const typesZodTool: DevToolConfig = {
     getComponent: () => import('@/pages/TypesZodPage').then(m => ({ default: m.TypesZodPage }))
 }
 
+const mockDataTool: DevToolConfig = {
+    id: 'mock-data',
+    name: 'Mock/Data',
+    description: 'Gere mocks a partir de JSON Schema ou OpenAPI em JSON/CSV/SQL',
+    icon: Sparkles,
+    path: '/mock-data',
+    category: 'generator',
+    getComponent: () => import('@pages/MockDataPage').then(m => ({ default: m.MockDataPage }))
+}
+
 export const devTools: DevToolConfig[] = [
     ...converterTools,
     comparatorTool,
-    typesZodTool
+    typesZodTool,
+    mockDataTool
 ]
 
 

@@ -14,6 +14,12 @@ export * from './core/domain/builders/default-type-model-builder';
 export * from './core/domain/emitters/typescript-emitter';
 export * from './core/domain/emitters/zod-emitter';
 export * from './core/application/types-generator-service';
+// Mock/Data generator
+export * from './core/domain/ports/mock-data';
+export * from './core/infrastructure/mock-data/simple-schema-loader';
+export * from './core/infrastructure/mock-data/simple-data-faker';
+export * from './core/infrastructure/mock-data/simple-exporters';
+export * from './core/application/mock-data-service';
 export * from './core/domain/comparators/json-comparator';
 export * from './core/domain/comparators/text-comparator';
 

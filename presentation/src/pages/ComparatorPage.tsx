@@ -1,7 +1,6 @@
 import { useState, useMemo } from 'react'
 import { PageHeader } from '@/components/layout/PageHeader'
 import { Card } from '@/components/ui/Card'
-import { CodeEditor } from '@/components/common/ui/CodeEditor'
 import { DiffCodeEditor } from '@/components/common/ui/DiffCodeEditor'
 import { Button } from '@/components/ui/Button'
 import { useComparators } from '@/hooks/useComparators'
