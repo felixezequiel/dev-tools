@@ -36,6 +36,7 @@ const features = [
 ]
 
 export function HomePage() {
+    const issuesUrl = (import.meta as any).env?.VITE_GITHUB_ISSUES_URL || 'https://github.com/felixezequiel/dev-tools/issues/new'
     return (
         <div className="space-y-8">
             {/* Header */}
@@ -43,6 +44,60 @@ export function HomePage() {
                 title="DevTools"
                 description="Ferramentas modernas para conversão de dados"
             />
+
+            {/* Feedback / Issues (Top) */}
+            <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.1 }}
+                className="rounded-lg border p-6 bg-card"
+            >
+                <div className="flex items-center justify-between">
+                    <div>
+                        <h3 className="text-lg font-semibold mb-1">Encontrou um problema?</h3>
+                        <p className="text-sm text-muted-foreground">Reporte diretamente nas issues do nosso GitHub. Seu feedback ajuda a melhorar a ferramenta.</p>
+                    </div>
+                    <a href={issuesUrl} target="_blank" rel="noopener noreferrer" className="inline-block">
+                        <button className="inline-flex items-center rounded-md border px-3 py-2 text-sm hover:bg-muted">
+                            Abrir Issues
+                        </button>
+                    </a>
+                </div>
+            </motion.div>
+
+            {/* Getting Started (Second section) */}
+            <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.2 }}
+                className="rounded-lg border bg-gradient-to-r from-primary/5 to-secondary/5 p-6"
+            >
+                <h3 className="text-lg font-semibold mb-2">Como começar</h3>
+                <p className="text-muted-foreground mb-4">
+                    Escolha uma ferramenta abaixo para começar a converter seus dados.
+                    Cada ferramenta é especializada em um tipo específico de conversão.
+                </p>
+                <div className="grid gap-4 md:grid-cols-3 text-sm">
+                    <div className="flex items-center space-x-2">
+                        <div className="flex h-6 w-6 items-center justify-center rounded-full bg-primary text-primary-foreground text-xs font-bold">
+                            1
+                        </div>
+                        <span>Escolha o formato de entrada (JSON, chave-valor, CSV)</span>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                        <div className="flex h-6 w-6 items-center justify-center rounded-full bg-primary text-primary-foreground text-xs font-bold">
+                            2
+                        </div>
+                        <span>Insira os dados com validação em tempo real</span>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                        <div className="flex h-6 w-6 items-center justify-center rounded-full bg-primary text-primary-foreground text-xs font-bold">
+                            3
+                        </div>
+                        <span>Converta e baixe o resultado no formato desejado</span>
+                    </div>
+                </div>
+            </motion.div>
 
             {/* Features */}
             <motion.div
@@ -123,39 +178,6 @@ export function HomePage() {
                 </div>
             </motion.div>
 
-            {/* Getting Started */}
-            <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: 0.5 }}
-                className="rounded-lg border bg-gradient-to-r from-primary/5 to-secondary/5 p-6"
-            >
-                <h3 className="text-lg font-semibold mb-2">Como começar</h3>
-                <p className="text-muted-foreground mb-4">
-                    Escolha uma ferramenta acima para começar a converter seus dados.
-                    Cada ferramenta é especializada em um tipo específico de conversão.
-                </p>
-                <div className="grid gap-4 md:grid-cols-3 text-sm">
-                    <div className="flex items-center space-x-2">
-                        <div className="flex h-6 w-6 items-center justify-center rounded-full bg-primary text-primary-foreground text-xs font-bold">
-                            1
-                        </div>
-                        <span>Escolha o formato de entrada (JSON, chave-valor, CSV)</span>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                        <div className="flex h-6 w-6 items-center justify-center rounded-full bg-primary text-primary-foreground text-xs font-bold">
-                            2
-                        </div>
-                        <span>Insira os dados com validação em tempo real</span>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                        <div className="flex h-6 w-6 items-center justify-center rounded-full bg-primary text-primary-foreground text-xs font-bold">
-                            3
-                        </div>
-                        <span>Converta e baixe o resultado no formato desejado</span>
-                    </div>
-                </div>
-            </motion.div>
         </div>
     )
 }
