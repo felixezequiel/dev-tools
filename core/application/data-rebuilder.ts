@@ -1,4 +1,4 @@
-import { RebuildPipeline } from './rebuild-pipeline';
+import { RebuildPipeline } from '../domain/rebuild-pipeline';
 import { DotBracketKeyPathParser } from '../infrastructure/key-path/dot-bracket-key-path-parser';
 import { LiteralStringValueCoercer } from '../infrastructure/value-coercers/literal-string-value-coercer';
 import { NestedPathStructureMutator } from '../infrastructure/structure-mutators/nested-path-structure-mutator';
@@ -6,6 +6,7 @@ import type { KeyPathParser } from '../interfaces/key-path-parser';
 import type { ValueCoercer } from '../interfaces/value-coercer';
 import type { StructureMutator } from '../interfaces/structure-mutator';
 import type { EntrySource } from '../interfaces/entry-source';
+import { ApplicationRebuildPipeline } from './ApplicationRebuildPipeline';
 
 export class DataReBuilder {
     private readonly parser: KeyPathParser;
@@ -18,8 +19,8 @@ export class DataReBuilder {
         this.mutator = params?.mutator ?? new NestedPathStructureMutator();
     }
 
-    rebuildFrom<TKey, TValue>(source: EntrySource<TKey, TValue>, keySelector?: (key: TKey) => string, valueSelector?: (value: TValue) => unknown): RebuildPipeline<TKey, TValue> {
-        return new RebuildPipeline<TKey, TValue>({
+    rebuildFrom<TKey, TValue>(source: EntrySource<TKey, TValue>, keySelector?: (key: TKey) => string, valueSelector?: (value: TValue) => unknown): ApplicationRebuildPipeline<TKey, TValue> {
+        const pipeline = new RebuildPipeline<TKey, TValue>({
             source,
             parser: this.parser,
             coercer: this.coercer,
@@ -27,6 +28,7 @@ export class DataReBuilder {
             keySelector,
             valueSelector,
         });
+        return new ApplicationRebuildPipeline(pipeline);
     }
 }
 

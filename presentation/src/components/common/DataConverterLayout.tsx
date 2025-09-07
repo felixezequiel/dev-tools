@@ -1,9 +1,10 @@
-import { useState, useCallback, Suspense } from 'react'
+import { useState, useCallback } from 'react'
 import { motion } from 'framer-motion'
 import { PageHeader } from '@/components/layout/PageHeader'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import { TextareaWithValidation } from '@/components/ui/TextareaWithValidation'
+import { CodeEditor } from '@/components/common/ui/CodeEditor'
 import { FileDropzone } from '@/components/common/FileDropzone'
 import { Badge } from '@/components/ui/Badge'
 import { useConversion } from '@/hooks/useConversion'
@@ -11,7 +12,7 @@ import { useFileUpload } from '@/hooks/useFileUpload'
 import { useInputValidationByType } from '@/hooks/useInputValidation'
 import { createEntrySource, inputFormats } from '@/lib/entrySources'
 import type { InputType } from '@/config/data-support'
-import { SyntaxHighlighterWrapper } from '@/components/common/ui/SyntaxHighlighterWrapper'
+// removed SyntaxHighlighterWrapper (using Monaco editor now)
 // yaml rendering handled via dynamic require inside render to avoid type issues
 // ResultRendererProps é usado apenas para tipos no ResultComponent
 import { InputModeToggle } from '@/components/common/ui/InputModeToggle'
@@ -19,7 +20,7 @@ import { InputTypeButtons } from '@/components/common/ui/InputTypeButtons'
 import { ConverterInfo } from '@/components/common/ConverterInfo'
 import { SectionHeading } from '@/components/common/ui/SectionHeading'
 import type { DataConverterConfig } from '@/types/converter'
-import { FileText, Download, Copy, Check, AlertCircle, Zap, Loader2 } from 'lucide-react'
+import { FileText, Download, Copy, Check, AlertCircle, Zap } from 'lucide-react'
 
 // DataConverterConfig movido para '@/types/converter'
 
@@ -188,14 +189,22 @@ export function DataConverterLayout({ config, breadcrumbs }: DataConverterLayout
                                     <SectionHeading step={3} title="Insira os dados" description="Cole ou digite os dados conforme o formato selecionado." />
                                     {inputMode === 'manual' ? (
                                         <>
-                                            <TextareaWithValidation
-                                                placeholder={inputFormats[inputType].placeholder}
-                                                value={input}
-                                                onChange={handleInputChange}
-                                                onValidate={validateInput}
-                                                successMessage="Formato válido"
-                                                className="min-h-[300px] font-mono text-sm"
-                                            />
+                                            <div className="space-y-2">
+                                                <CodeEditor
+                                                    value={input}
+                                                    onChange={handleInputChange}
+                                                    language={inputType === 'json' ? 'json' : inputType === 'yaml' ? 'yaml' : inputType === 'xml' ? 'xml' : 'plaintext'}
+                                                    height={320}
+                                                />
+                                                <TextareaWithValidation
+                                                    placeholder={inputFormats[inputType].placeholder}
+                                                    value={input}
+                                                    onChange={handleInputChange}
+                                                    onValidate={validateInput}
+                                                    successMessage="Formato válido"
+                                                    className="hidden"
+                                                />
+                                            </div>
                                             <Button variant="outline" size="sm" onClick={() => setInput(inputFormats[inputType].example)}>
                                                 Carregar Exemplo
                                             </Button>
@@ -333,30 +342,23 @@ export function DataConverterLayout({ config, breadcrumbs }: DataConverterLayout
                                                 </Button>
                                             </div>
                                         )}
-                                        <div className="rounded-md border bg-muted/50 p-4 overflow-x-auto">
-                                            <div className="min-w-full">
-                                                {(() => {
-                                                    if (config.outputFormat === 'json' && typeof result?.data === 'object') {
-                                                        return (
-                                                            <Suspense fallback={<div className="flex items-center justify-center h-[200px]"><Loader2 className="h-6 w-6 animate-spin" /></div>}>
-                                                                <SyntaxHighlighterWrapper code={JSON.stringify(result.data, null, 2)} />
-                                                            </Suspense>
-                                                        )
-                                                    }
-                                                    if (config.outputFormat === 'yaml') {
-                                                        const yamlText = typeof result?.data === 'string' ? result.data : (require('js-yaml') as any).dump(result?.data ?? {}, { indent: 2, lineWidth: 120 })
-                                                        return (<pre className="text-sm font-mono whitespace-pre min-w-full overflow-x-auto">{yamlText}</pre>)
-                                                    }
-                                                    if (config.outputFormat === 'formdata' && result?.data instanceof FormData) {
-                                                        const entries = Array.from(result.data.entries())
-                                                        const formattedEntries = entries.map(([key, value]) => `${key}=${value}`).join('\n')
-                                                        return (<pre className="text-sm font-mono whitespace-pre min-w-full overflow-x-auto">{formattedEntries}</pre>)
-                                                    }
-                                                    return (
-                                                        <pre className="text-sm font-mono whitespace-pre min-w-full overflow-x-auto">{typeof result?.data === 'string' ? result.data : JSON.stringify(result?.data, null, 2)}</pre>
-                                                    )
-                                                })()}
-                                            </div>
+                                        <div className="rounded-md border bg-muted/50 p-2">
+                                            {(() => {
+                                                if (config.outputFormat === 'json') {
+                                                    const code = typeof result?.data === 'string' ? result.data : JSON.stringify(result?.data ?? {}, null, 2)
+                                                    return <CodeEditor value={code} onChange={() => {}} readOnly language="json" height={360} />
+                                                }
+                                                if (config.outputFormat === 'yaml') {
+                                                    const code = typeof result?.data === 'string' ? result.data : (require('js-yaml') as any).dump(result?.data ?? {}, { indent: 2, lineWidth: 120 })
+                                                    return <CodeEditor value={code} onChange={() => {}} readOnly language="yaml" height={360} />
+                                                }
+                                                if (config.outputFormat === 'xml') {
+                                                    const code = typeof result?.data === 'string' ? result.data : String(result?.data ?? '')
+                                                    return <CodeEditor value={code} onChange={() => {}} readOnly language="xml" height={360} />
+                                                }
+                                                const code = typeof result?.data === 'string' ? result.data : JSON.stringify(result?.data ?? {}, null, 2)
+                                                return <CodeEditor value={code} onChange={() => {}} readOnly language="plaintext" height={360} />
+                                            })()}
                                         </div>
                                     </div>
                                 )

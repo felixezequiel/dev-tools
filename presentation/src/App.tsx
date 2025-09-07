@@ -6,6 +6,7 @@ import { PageLoader } from '@/components/common/PageLoader'
 // Lazy loading das páginas para melhor performance
 const HomePage = lazy(() => import('@/pages/HomePage').then(module => ({ default: module.HomePage })))
 const GenericConverterPage = lazy(() => import('@/pages/GenericConverterPage').then(module => ({ default: module.GenericConverterPage })))
+const ComparatorPage = lazy(() => import('@/pages/ComparatorPage').then(module => ({ default: module.ComparatorPage })))
 const NotFoundPage = lazy(() => import('@/pages/NotFoundPage').then(module => ({ default: module.NotFoundPage })))
 
 function App() {
@@ -15,6 +16,7 @@ function App() {
                 <Route path="/" element={<DevToolsLayout />}>
                     <Route index element={<HomePage />} />
                     <Route path=":slug" element={<GenericConverterPage />} />
+                    <Route path="comparator" element={<ComparatorPage />} />
                 </Route>
                 <Route path="*" element={<NotFoundPage />} />
             </Routes>

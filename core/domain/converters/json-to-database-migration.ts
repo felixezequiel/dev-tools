@@ -1,5 +1,5 @@
-import { JsonOutputBuilder } from './ports/json-output-builder';
-import { JsonSerializer } from './ports/json-serializer';
+import { JsonOutputBuilder } from '../ports/json-output-builder';
+import { JsonSerializer } from '../ports/json-serializer';
 
 export interface MigrationOptions {
     tableName: string;
@@ -94,7 +94,7 @@ export class JsonToDatabaseMigrationBuilder implements JsonOutputBuilder<Migrati
         const createTable = this.buildCreateTable(columns);
         const dropTable = this.buildDropTable();
         const insertData = this.buildInsertData([data]);
-        const deleteData = this.buildDeleteData([data]);
+        const deleteData = this.buildDeleteData();
 
         return { createTable, dropTable, insertData, deleteData };
     }
@@ -105,7 +105,7 @@ export class JsonToDatabaseMigrationBuilder implements JsonOutputBuilder<Migrati
         const createTable = this.buildCreateTable(columns);
         const dropTable = this.buildDropTable();
         const insertData = this.buildInsertData(data);
-        const deleteData = this.buildDeleteData(data);
+        const deleteData = this.buildDeleteData();
 
         return { createTable, dropTable, insertData, deleteData };
     }
@@ -241,7 +241,7 @@ export class JsonToDatabaseMigrationBuilder implements JsonOutputBuilder<Migrati
         return `INSERT INTO \`${this.options.tableName}\` (${columns.map(c => `"${c}"`).join(', ')}) VALUES\n            ${values};`;
     }
 
-    private buildDeleteData(data: Record<string, any>[]): string {
+    private buildDeleteData(): string {
         // Simple delete - in a real scenario, you'd want more sophisticated logic
         return `DELETE FROM \`${this.options.tableName}\`;`;
     }

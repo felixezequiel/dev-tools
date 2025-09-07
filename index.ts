@@ -1,12 +1,15 @@
 // Application
-export * from './core/domain/data-rebuilder';
+export * from './core/application/data-rebuilder';
 export * from './core/domain/rebuild-pipeline';
 export * from './core/domain/converters/entry-source-to-json-converter';
 export * from './core/domain/converters/json-to-formdata';
 export * from './core/domain/converters/json-to-csv';
 export * from './core/domain/ports/json-output-builder';
 export * from './core/domain/ports/json-serializer';
+export * from './core/domain/ports/diff';
 export * from './core/domain/converters/curl-parser';
+export * from './core/domain/comparators/json-comparator';
+export * from './core/domain/comparators/text-comparator';
 
 // Domain
 export * from './core/domain/ports/key-path';

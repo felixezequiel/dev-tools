@@ -1,6 +1,4 @@
-export interface CsvFieldEscaper {
-    escape(field: string): string;
-}
+import { CsvFieldEscaper } from '../../domain/ports/csv-field-escaper';
 
 export class DefaultCsvFieldEscaper implements CsvFieldEscaper {
     escape(field: string): string {

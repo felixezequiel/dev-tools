@@ -1,7 +1,6 @@
 import { Link, useLocation } from 'react-router-dom'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/Button'
-import { Badge } from '@/components/ui/Badge'
 import { useState } from 'react'
 import { Home, FileText, Moon, Sun, Monitor, ChevronDown } from 'lucide-react'
 import { useThemeContext } from '@/components/common/ThemeProvider'
@@ -87,25 +86,21 @@ export function Sidebar({ className }: SidebarProps) {
                             <ChevronDown className={cn('h-4 w-4 transition-transform', open.comparators ? 'rotate-180' : 'rotate-0')} />
                         </Button>
                         <div className={cn('mt-1 space-y-1 pl-2', !open.comparators && 'hidden')}>
-                            {/* Placeholders desabilitados até as rotas existirem */}
-                            <Button
-                                variant="ghost"
-                                className="w-full justify-start min-w-0 h-9 px-3 text-sm gap-3 rounded-md"
-                                disabled
-                            >
-                                <FileText className="h-4 w-4 flex-shrink-0" />
-                                <span className="truncate">Comparar JSON</span>
-                                <Badge variant="secondary" className="ml-auto">em breve</Badge>
-                            </Button>
-                            <Button
-                                variant="ghost"
-                                className="w-full justify-start min-w-0 h-9 px-3 text-sm gap-3 rounded-md"
-                                disabled
-                            >
-                                <FileText className="h-4 w-4 flex-shrink-0" />
-                                <span className="truncate">Comparar Texto</span>
-                                <Badge variant="secondary" className="ml-auto">em breve</Badge>
-                            </Button>
+                            {(() => {
+                                const href = '/comparator'
+                                const isActive = location.pathname === href
+                                return (
+                                    <Link to={href}>
+                                        <Button
+                                            variant={isActive ? 'secondary' : 'ghost'}
+                                            className={cn('w-full justify-start min-w-0 h-9 px-3 text-sm gap-3 rounded-md transition-colors', isActive && 'bg-sidebar-accent text-sidebar-accent-foreground')}
+                                        >
+                                            <FileText className="h-4 w-4 flex-shrink-0" />
+                                            <span className="truncate">Comparador de Dados</span>
+                                        </Button>
+                                    </Link>
+                                )
+                            })()}
                         </div>
                     </div>
                 </div>

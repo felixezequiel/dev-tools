@@ -1,5 +1,4 @@
 import { JsonOutputBuilder } from '../ports/json-output-builder';
-import { JsonSerializer } from '../ports/json-serializer';
 
 export interface SqlCreateTableOptions {
     tableName: string;

@@ -16,6 +16,18 @@ const tools: Tool[] = Object.entries(converterConfigs).map(([key, cfg]) => ({
     category: 'converter'
 }))
 
+// Add comparator tool
+const comparatorTool: Tool = {
+    id: 'comparator',
+    name: 'Comparador de Dados',
+    description: 'Compare JSON e texto, detectando caracteres invisíveis',
+    iconComponent: Sparkles,
+    path: '/comparator',
+    category: 'validator'
+}
+
+const allTools: Tool[] = [...tools, comparatorTool]
+
 const features = [
     {
         icon: Zap,
@@ -76,11 +88,11 @@ export function HomePage() {
             >
                 <div className="flex items-center justify-between">
                     <h2 className="text-2xl font-bold tracking-tight">Ferramentas Disponíveis</h2>
-                    <Badge variant="secondary">{tools.length} ferramentas</Badge>
+                    <Badge variant="secondary">{allTools.length} ferramentas</Badge>
                 </div>
 
                 <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                    {tools.map((tool, index) => (
+                    {allTools.map((tool, index) => (
                         <motion.div
                             key={tool.id}
                             initial={{ opacity: 0, y: 20 }}

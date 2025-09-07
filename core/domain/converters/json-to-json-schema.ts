@@ -1,5 +1,4 @@
 import { JsonOutputBuilder } from '../ports/json-output-builder';
-import { JsonSerializer } from '../ports/json-serializer';
 
 export interface JsonSchemaOptions {
     title?: string;
@@ -32,11 +31,9 @@ export interface JsonSchema {
 }
 
 export class JsonToJsonSchemaBuilder implements JsonOutputBuilder<JsonSchema> {
-    private readonly serializer: JsonSerializer;
     private readonly options: JsonSchemaOptions;
 
-    constructor(params: { serializer: JsonSerializer; options?: JsonSchemaOptions }) {
-        this.serializer = params.serializer;
+    constructor(params: { options?: JsonSchemaOptions }) {
         this.options = {
             version: 'https://json-schema.org/draft/2020-12/schema',
             additionalProperties: false,

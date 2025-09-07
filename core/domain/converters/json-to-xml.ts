@@ -75,7 +75,6 @@ export class JsonToXmlBuilder implements JsonOutputBuilder<string> {
 
         if (typeof data === 'object') {
             let xml = `${indent}<${elementName}`;
-            let content = '';
             let hasContent = false;
 
             const attributes: string[] = [];

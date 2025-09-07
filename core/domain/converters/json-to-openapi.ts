@@ -1,5 +1,4 @@
 import { JsonOutputBuilder } from '../ports/json-output-builder';
-import { JsonSerializer } from '../ports/json-serializer';
 
 export interface OpenApiOptions {
     title?: string;
@@ -26,12 +25,10 @@ export interface OpenApiSpec {
 }
 
 export class JsonToOpenApiBuilder implements JsonOutputBuilder<OpenApiSpec> {
-    private readonly serializer: JsonSerializer;
     private readonly options: OpenApiOptions;
     private readonly explicitTitleProvided: boolean;
 
-    constructor(params: { serializer: JsonSerializer; options: OpenApiOptions }) {
-        this.serializer = params.serializer;
+    constructor(params: { options: OpenApiOptions }) {
         this.explicitTitleProvided = Object.prototype.hasOwnProperty.call(params.options, 'title');
         this.options = {
             title: 'API Documentation',

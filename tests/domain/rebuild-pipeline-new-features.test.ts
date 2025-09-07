@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { DataReBuilder } from '../../core/domain/data-rebuilder';
+import { DataReBuilder } from '../../core/application/data-rebuilder';
 import { EntrySource } from '../../core/interfaces/entry-source';
 
 class SimpleEntrySource implements EntrySource<string, any> {

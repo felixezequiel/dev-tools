@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { DataReBuilder } from '../../core/domain/data-rebuilder';
+import { DataReBuilder } from '../../core/application/data-rebuilder';
 import { JsonDataEntrySource } from '../../core/infrastructure/entry-sources/json-data-entry-source';
 
 describe('RebuildPipeline toCsv', () => {

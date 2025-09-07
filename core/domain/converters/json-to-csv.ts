@@ -1,7 +1,7 @@
 import { KeyPathFormatter } from '../../interfaces/key-path-formatter';
 import { JsonSerializer } from '../ports/json-serializer';
 import { JsonOutputBuilder } from '../ports/json-output-builder';
-import { CsvFieldEscaper } from '../../infrastructure/csv/csv-escaper';
+import { CsvFieldEscaper } from '../ports/csv-field-escaper';
 
 export class JsonToCsvBuilder implements JsonOutputBuilder<string> {
     private readonly formatter: KeyPathFormatter;
