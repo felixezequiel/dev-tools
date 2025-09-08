@@ -17,6 +17,7 @@ import { ThemeSwitch } from '@/components/common/ThemeSwitch'
 import { LanguageSelector } from '@/components/ui/LanguageSelector'
 import { HeaderProvider, useHeader } from './HeaderContext'
 import { FileText } from 'lucide-react'
+import { AdSlot } from '@/components/ads/AdSlot'
 
 interface DevToolsLayoutProps {
     className?: string
@@ -130,6 +131,10 @@ export function DevToolsLayout({ className }: DevToolsLayoutProps) {
                 <HeaderBar />
                 <HeaderSync />
                 <main className="area-main overflow-y-auto py-6 px-6 md:px-8 lg:px-16">
+                    {/* Header banner ad slot with reserved height to avoid CLS */}
+
+                    <AdSlot slot="header_banner" />
+
                     {/* Breadcrumb */}
                     <BreadcrumbNav items={breadcrumbs} />
 

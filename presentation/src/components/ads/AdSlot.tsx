@@ -72,9 +72,11 @@ export function AdSlot({ slot, className, style }: AdSlotProps) {
         if (!client || !slotId) {
             return null
         }
-        // Ensure script is present once
+        // Ensure script is present once (skip if global exists)
         const SCRIPT_ID = 'adsense-script'
-        if (!document.getElementById(SCRIPT_ID)) {
+        // @ts-ignore
+        const hasGlobal = typeof window.adsbygoogle !== 'undefined'
+        if (!document.getElementById(SCRIPT_ID) && !hasGlobal) {
             const s = document.createElement('script')
             s.id = SCRIPT_ID
             s.async = true
@@ -101,6 +103,7 @@ export function AdSlot({ slot, className, style }: AdSlotProps) {
                     data-ad-slot={slotId}
                     data-ad-format="auto"
                     data-full-width-responsive="true"
+                    {...(typeof window !== 'undefined' && /^(localhost|127\\.0\\.0\\.1)$/.test(window.location.hostname) ? { 'data-adtest': 'on' } : {})}
                 />
                 {(() => {
                     try {

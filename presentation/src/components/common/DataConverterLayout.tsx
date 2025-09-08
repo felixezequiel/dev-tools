@@ -399,7 +399,7 @@ export function DataConverterLayout({ config }: DataConverterLayoutProps) {
                                 </div>
                             )}
                             {/* Output footer ad */}
-                            <AdSlot slot="converter_output_footer" />
+                            <AdSlot slot="converter_output_result" />
                         </CardContent>
 
                     </Card>

@@ -5,6 +5,7 @@ export type AdPlacement =
     | 'sidebar_sticky'
     | 'converter_inline'
     | 'converter_output_footer'
+    | 'converter_output_result'
     | 'comparator_mid';
 
 export interface AdPlacementConfig {
@@ -29,21 +30,23 @@ export const adsConfig: AdsConfig = {
     enabled: true,
     provider: 'adsense',
     placements: {
-        header_banner: { enabled: false, hideOnMobile: true, unitKey: 'header_banner' },
-        sidebar_sticky: { enabled: true, hideOnMobile: true, unitKey: 'sidebar_sticky' },
+        header_banner: { enabled: true, hideOnMobile: false, unitKey: 'header_banner' },
+        sidebar_sticky: { enabled: true, hideOnMobile: false, unitKey: 'sidebar_sticky' },
         converter_inline: { enabled: true, hideOnMobile: false, unitKey: 'converter_inline' },
         converter_output_footer: { enabled: true, hideOnMobile: false, unitKey: 'converter_output_footer' },
         comparator_mid: { enabled: true, hideOnMobile: false, unitKey: 'comparator_mid' },
+        converter_output_result: { enabled: true, hideOnMobile: false, unitKey: 'converter_output_result' },
     },
     adsense: {
         clientId: 'ca-pub-4797377323566395',
         // TODO: substitua pelas IDs reais de cada unidade AdSense
         slots: {
-            header_banner: '',
-            sidebar_sticky: '',
-            converter_inline: '',
-            converter_output_footer: '',
-            comparator_mid: '',
+            header_banner: '2531416998',
+            sidebar_sticky: '8985144705',
+            converter_inline: '6754281773',
+            converter_output_footer: '8270828830',
+            comparator_mid: '3844498667',
+            converter_output_result: '1298226373',
         },
     },
 };
