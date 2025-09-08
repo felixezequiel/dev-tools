@@ -218,6 +218,11 @@ export const translations: Record<string, Translations> = {
         typesZodGenerator_desc: 'Generate TS types and Zod schemas from JSON.',
         mockDataGenerator_desc: 'Generate mocks from JSON Schema or OpenAPI in JSON/CSV/SQL.',
         dataComparator_desc: 'Compare JSON and text, detecting invisible characters.',
+
+        // Common UI states and actions
+        manual: 'Manual',
+        file: 'File',
+        dropFileHere: 'Drop the file here, or click to select',
     },
     pt_BR: {
         // Navigation
@@ -431,6 +436,11 @@ export const translations: Record<string, Translations> = {
         typesZodGenerator_desc: 'Gere tipos TS e schemas Zod a partir de JSON.',
         mockDataGenerator_desc: 'Gere mocks a partir de JSON Schema ou OpenAPI em JSON/CSV/SQL.',
         dataComparator_desc: 'Compare JSON e texto, detectando caracteres invisíveis.',
+
+        // Common UI states and actions
+        manual: 'Manual',
+        file: 'Arquivo',
+        dropFileHere: 'Arraste e solte um arquivo aqui, ou clique para selecionar',
     },
 };
 

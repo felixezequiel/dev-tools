@@ -205,7 +205,7 @@ export function FormDataConverterLayout({ breadcrumbs }: FormDataConverterLayout
                                         onFileSelect={handleFileSelect}
                                         onFileRemove={handleFileRemove}
                                         acceptedFileTypes={['.json', '.csv', '.yaml', '.yml', '.xml', '.sql', '.txt', '.tsv', '.ts']}
-                                        placeholder="Arraste um arquivo JSON, CSV, YAML, XML, SQL ou TXT aqui"
+                                        placeholder={t("dropFileHere")}
                                     />
                                 )}
 

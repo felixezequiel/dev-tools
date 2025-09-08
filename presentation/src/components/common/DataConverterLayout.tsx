@@ -210,7 +210,7 @@ export function DataConverterLayout({ config }: DataConverterLayoutProps) {
                                             onFileSelect={handleFileSelect}
                                             onFileRemove={handleFileRemove}
                                             acceptedFileTypes={config.acceptedFileTypes}
-                                            placeholder={config.placeholder}
+                                            placeholder={t(config.placeholder)}
                                         />
                                     )}
 

@@ -1,5 +1,6 @@
 import { Button } from '@/components/ui/Button'
 import { FileText, Upload } from 'lucide-react'
+import { useTranslation } from '@/lib/i18n'
 
 interface InputModeToggleProps {
     mode: 'manual' | 'file'
@@ -7,6 +8,7 @@ interface InputModeToggleProps {
 }
 
 export function InputModeToggle({ mode, onChange }: InputModeToggleProps) {
+    const { t } = useTranslation()
     return (
         <div className="flex space-x-2">
             <Button
@@ -16,7 +18,7 @@ export function InputModeToggle({ mode, onChange }: InputModeToggleProps) {
                 className="flex items-center space-x-1"
             >
                 <FileText className="h-3 w-3" />
-                <span>Digitar</span>
+                <span>{t('manual')}</span>
             </Button>
             <Button
                 variant={mode === 'file' ? 'default' : 'outline'}
@@ -25,7 +27,7 @@ export function InputModeToggle({ mode, onChange }: InputModeToggleProps) {
                 className="flex items-center space-x-1"
             >
                 <Upload className="h-3 w-3" />
-                <span>Arquivo</span>
+                <span>{t('file')}</span>
             </Button>
         </div>
     )

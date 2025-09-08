@@ -29,7 +29,7 @@ export const converterConfigs: Record<string, DataConverterConfig> = {
         outputFormat: 'json',
         outputDescription: 'JSON',
         acceptedFileTypes: ['.json', '.csv', '.yaml', '.yml', '.xml', '.sql', '.txt', '.tsv', '.ts'],
-        placeholder: 'Arraste um arquivo JSON, CSV, YAML, XML, SQL ou TXT aqui',
+        placeholder: 'dropFileHere',
         icon: FileText,
         usage: {
             summary: 'json_usage_summary',
@@ -51,7 +51,7 @@ export const converterConfigs: Record<string, DataConverterConfig> = {
         outputFormat: 'csv',
         outputDescription: 'CSV',
         acceptedFileTypes: ['.json', '.csv', '.yaml', '.yml', '.xml', '.sql', '.txt', '.tsv', '.ts'],
-        placeholder: 'Arraste um arquivo JSON, CSV, YAML, XML, SQL ou TXT aqui',
+        placeholder: 'dropFileHere',
         icon: Table,
         ResultComponent: CsvResult as any,
         usage: {
@@ -74,7 +74,7 @@ export const converterConfigs: Record<string, DataConverterConfig> = {
         outputFormat: 'formdata',
         outputDescription: 'FormData',
         acceptedFileTypes: ['.json', '.csv', '.yaml', '.yml', '.xml', '.sql', '.txt', '.tsv', '.ts'],
-        placeholder: 'Arraste um arquivo JSON, CSV, YAML, XML, SQL ou TXT aqui',
+        placeholder: 'dropFileHere',
         icon: Database,
         ResultComponent: FormDataResult,
         usage: {
@@ -97,7 +97,7 @@ export const converterConfigs: Record<string, DataConverterConfig> = {
         outputFormat: 'xml',
         outputDescription: 'XML',
         acceptedFileTypes: ['.json', '.csv', '.yaml', '.yml', '.xml', '.sql', '.txt', '.tsv', '.ts'],
-        placeholder: 'Arraste um arquivo JSON, CSV, YAML, XML, SQL ou TXT aqui',
+        placeholder: 'dropFileHere',
         icon: FileCode,
         usage: {
             summary: 'xml_usage_summary',
@@ -119,7 +119,7 @@ export const converterConfigs: Record<string, DataConverterConfig> = {
         outputFormat: 'yaml',
         outputDescription: 'YAML',
         acceptedFileTypes: ['.json', '.csv', '.yaml', '.yml', '.xml', '.sql', '.txt', '.tsv', '.ts'],
-        placeholder: 'Arraste um arquivo JSON, CSV, YAML, XML, SQL ou TXT aqui',
+        placeholder: 'dropFileHere',
         icon: FileCode,
         usage: {
             summary: 'yaml_usage_summary',
@@ -141,7 +141,7 @@ export const converterConfigs: Record<string, DataConverterConfig> = {
         outputFormat: 'json-schema',
         outputDescription: 'JSON Schema',
         acceptedFileTypes: ['.json', '.csv', '.yaml', '.yml', '.xml', '.sql', '.txt', '.tsv', '.ts'],
-        placeholder: 'Arraste um arquivo JSON, CSV, YAML, XML, SQL ou TXT aqui',
+        placeholder: 'dropFileHere',
         icon: FileJson,
         usage: {
             summary: 'jsonschema_usage_summary',
@@ -163,7 +163,7 @@ export const converterConfigs: Record<string, DataConverterConfig> = {
         outputFormat: 'openapi',
         outputDescription: 'OpenAPI',
         acceptedFileTypes: ['.json', '.csv', '.yaml', '.yml', '.xml', '.sql', '.txt', '.tsv', '.ts'],
-        placeholder: 'Arraste um arquivo JSON, CSV, YAML, XML, SQL ou TXT aqui',
+        placeholder: 'dropFileHere',
         icon: FileJson,
         usage: {
             summary: 'openapi_usage_summary',
@@ -185,7 +185,7 @@ export const converterConfigs: Record<string, DataConverterConfig> = {
         outputFormat: 'sql',
         outputDescription: 'SQL',
         acceptedFileTypes: ['.json', '.csv', '.yaml', '.yml', '.xml', '.sql', '.txt', '.tsv', '.ts'],
-        placeholder: 'Arraste um arquivo JSON, CSV, YAML, XML, SQL ou TXT aqui',
+        placeholder: 'dropFileHere',
         icon: FileSpreadsheet,
         usage: {
             summary: 'sql_usage_summary',
@@ -207,7 +207,7 @@ export const converterConfigs: Record<string, DataConverterConfig> = {
         outputFormat: 'db-migration',
         outputDescription: 'Database Migration',
         acceptedFileTypes: ['.json', '.csv', '.yaml', '.yml', '.xml', '.sql', '.txt', '.tsv', '.ts'],
-        placeholder: 'Arraste um arquivo JSON, CSV, YAML, XML, SQL ou TXT aqui',
+        placeholder: 'dropFileHere',
         icon: Database,
         ResultComponent: DBMigrationResult,
         usage: {
