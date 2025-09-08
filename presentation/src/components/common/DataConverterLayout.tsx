@@ -1,6 +1,5 @@
 import { useState, useCallback } from 'react'
 import { motion } from 'framer-motion'
-import { PageHeader } from '@/components/layout/PageHeader'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import { TextareaWithValidation } from '@/components/ui/TextareaWithValidation'
@@ -23,15 +22,16 @@ import { ConverterInfo } from '@/components/common/ConverterInfo'
 import { SectionHeading } from '@/components/common/ui/SectionHeading'
 import type { DataConverterConfig } from '@/types/converter'
 import { FileText, Download, Copy, Check, AlertCircle, Zap } from 'lucide-react'
+import { useTranslation } from '@/lib/i18n'
 
 // DataConverterConfig movido para '@/types/converter'
 
 interface DataConverterLayoutProps {
     config: DataConverterConfig
-    breadcrumbs: Array<{ label: string; path?: string; isActive?: boolean }>
 }
 
-export function DataConverterLayout({ config, breadcrumbs }: DataConverterLayoutProps) {
+export function DataConverterLayout({ config }: DataConverterLayoutProps) {
+    const { t } = useTranslation()
     const [input, setInput] = useState('')
     const [inputType, setInputType] = useState<InputType>(config.defaultInputType)
     const [inputMode, setInputMode] = useState<'manual' | 'file'>('manual')
@@ -137,12 +137,6 @@ export function DataConverterLayout({ config, breadcrumbs }: DataConverterLayout
 
     return (
         <div className="space-y-6">
-            <PageHeader
-                title={config.title}
-                description={config.description}
-                breadcrumbs={breadcrumbs}
-            />
-
             <div className="grid gap-8 lg:grid-cols-2">
                 {/* Input Section */}
                 <motion.div
@@ -156,10 +150,10 @@ export function DataConverterLayout({ config, breadcrumbs }: DataConverterLayout
                                 <div>
                                     <CardTitle className="flex items-center space-x-2">
                                         <FileText className="h-5 w-5" />
-                                        <span>Dados de Entrada</span>
+                                        <span>{t('inputData')}</span>
                                     </CardTitle>
                                     <CardDescription>
-                                        Escolha o modo de entrada (Digitar ou Arquivo) e o tipo de formato abaixo para inserir seus dados.
+                                        {t('inputSectionDescription')}
                                     </CardDescription>
                                     <div className="mt-2">
                                         <ConverterInfo usage={config.usage} />
@@ -171,13 +165,13 @@ export function DataConverterLayout({ config, breadcrumbs }: DataConverterLayout
                             <div className="space-y-6">
                                 {/* Passo 1: Tipo de entrada */}
                                 <div className="space-y-2">
-                                    <SectionHeading step={1} title="Escolha o tipo de dados" description="Selecione o formato que melhor representa seus dados." />
+                                    <SectionHeading step={1} title={t('chooseDataType')} description={t('chooseDataTypeDesc')} />
                                     <InputTypeButtons allowedTypes={config.inputTypes} current={inputType} onChange={handleInputTypeChange} />
                                 </div>
 
                                 {/* Passo 2: Modo */}
                                 <div className="space-y-2">
-                                    <SectionHeading step={2} title="Escolha como inserir" description="Digite manualmente ou envie um arquivo." />
+                                    <SectionHeading step={2} title={t('chooseHowToInsert')} description={t('chooseHowToInsertDesc')} />
                                     <InputModeToggle mode={inputMode} onChange={handleInputModeChange} />
                                 </div>
 
@@ -188,7 +182,7 @@ export function DataConverterLayout({ config, breadcrumbs }: DataConverterLayout
 
                                 {/* Passo 3: Inserção de dados */}
                                 <div className="space-y-2">
-                                    <SectionHeading step={3} title="Insira os dados" description="Cole ou digite os dados conforme o formato selecionado." />
+                                    <SectionHeading step={3} title={t('insertData')} description={t('insertDataDesc')} />
                                     {inputMode === 'manual' ? (
                                         <>
                                             <div className="space-y-2">
@@ -203,12 +197,12 @@ export function DataConverterLayout({ config, breadcrumbs }: DataConverterLayout
                                                     value={input}
                                                     onChange={handleInputChange}
                                                     onValidate={validateInput}
-                                                    successMessage="Formato válido"
+                                                    successMessage={t('validFormat')}
                                                     className="hidden"
                                                 />
                                             </div>
                                             <Button variant="outline" size="sm" onClick={() => setInput(inputFormats[inputType].example)}>
-                                                Carregar Exemplo
+                                                {t('loadExample')}
                                             </Button>
                                         </>
                                     ) : (
@@ -222,7 +216,7 @@ export function DataConverterLayout({ config, breadcrumbs }: DataConverterLayout
 
                                     <div className="flex items-center justify-between">
                                         <div className="text-sm text-muted-foreground">
-                                            {input.split('\n').filter(line => line.trim()).length} linhas
+                                            {input.split('\n').filter(line => line.trim()).length} {t('lines')}
                                         </div>
                                         <Button
                                             onClick={handleConvert}
@@ -242,10 +236,10 @@ export function DataConverterLayout({ config, breadcrumbs }: DataConverterLayout
                                             <Zap className="mr-2 h-4 w-4" />
                                             {
                                                 inputMode === 'manual' && inputValidation.hasErrors
-                                                    ? "Corrigir Erros"
+                                                    ? t('conversionError')
                                                     : (!input.trim() && !uploadedFile)
-                                                        ? "Selecione Dados"
-                                                        : `Converter para ${config.outputFormat.toUpperCase()}`
+                                                        ? '—'
+                                                        : `${t('convertTo')} ${config.outputFormat.toUpperCase()}`
                                             }
                                         </Button>
                                     </div>
@@ -267,7 +261,7 @@ export function DataConverterLayout({ config, breadcrumbs }: DataConverterLayout
                                 <div>
                                     <CardTitle className="flex items-center space-x-2">
                                         <config.icon className="h-5 w-5" />
-                                        <span>Resultado {config.outputFormat.toUpperCase()}</span>
+                                        <span>{t('result')} {config.outputFormat.toUpperCase()}</span>
                                     </CardTitle>
                                     <CardDescription>
                                         {config.outputDescription}
@@ -307,7 +301,7 @@ export function DataConverterLayout({ config, breadcrumbs }: DataConverterLayout
                                     <div className="space-y-4">
                                         {!(config.outputFormat === 'sql' || config.outputFormat === 'sql-insert' || config.outputFormat === 'sql-update' || config.outputFormat === 'sql-create-table' || config.outputFormat === 'json') && (
                                             <div className="flex items-center space-x-2">
-                                                <Badge variant="success">Sucesso</Badge>
+                                                <Badge variant="success">{t('success')}</Badge>
                                                 {result.executionTime && (
                                                     <span className="text-sm text-muted-foreground">
                                                         {result.executionTime.toFixed(2)}ms
@@ -342,7 +336,7 @@ export function DataConverterLayout({ config, breadcrumbs }: DataConverterLayout
                                                         await regenerateSql('create-table', createEntrySource(input, inputType))
                                                     }}
                                                 >
-                                                CREATE TABLE
+                                                    CREATE TABLE
                                                 </Button>
                                             </div>
                                         )}
@@ -362,11 +356,11 @@ export function DataConverterLayout({ config, breadcrumbs }: DataConverterLayout
                                                 }
                                                 if (config.outputFormat === 'yaml') {
                                                     const code = typeof result?.data === 'string' ? result.data : (require('js-yaml') as any).dump(result?.data ?? {}, { indent: 2, lineWidth: 120 })
-                                                    return <CodeEditor value={code} onChange={() => {}} readOnly language="yaml" height={360} />
+                                                    return <CodeEditor value={code} onChange={() => { }} readOnly language="yaml" height={360} />
                                                 }
                                                 if (config.outputFormat === 'xml') {
                                                     const code = typeof result?.data === 'string' ? result.data : String(result?.data ?? '')
-                                                    return <CodeEditor value={code} onChange={() => {}} readOnly language="xml" height={360} />
+                                                    return <CodeEditor value={code} onChange={() => { }} readOnly language="xml" height={360} />
                                                 }
                                                 if (config.outputFormat === 'sql' || config.outputFormat === 'sql-insert' || config.outputFormat === 'sql-update' || config.outputFormat === 'sql-create-table') {
                                                     return (
@@ -381,7 +375,7 @@ export function DataConverterLayout({ config, breadcrumbs }: DataConverterLayout
                                                     )
                                                 }
                                                 const code = typeof result?.data === 'string' ? result.data : JSON.stringify(result?.data ?? {}, null, 2)
-                                                return <CodeEditor value={code} onChange={() => {}} readOnly language="plaintext" height={360} />
+                                                return <CodeEditor value={code} onChange={() => { }} readOnly language="plaintext" height={360} />
                                             })()}
                                         </div>
                                     </div>
@@ -390,7 +384,7 @@ export function DataConverterLayout({ config, breadcrumbs }: DataConverterLayout
                                 <div className="flex items-center space-x-2 rounded-md border border-destructive/50 bg-destructive/5 p-4">
                                     <AlertCircle className="h-5 w-5 text-destructive" />
                                     <div>
-                                        <p className="font-medium text-destructive">Erro na conversão</p>
+                                        <p className="font-medium text-destructive">{t('conversionError')}</p>
                                         <p className="text-sm text-muted-foreground">{result.error}</p>
                                     </div>
                                 </div>
@@ -398,7 +392,7 @@ export function DataConverterLayout({ config, breadcrumbs }: DataConverterLayout
                                 <div className="flex h-[300px] items-center justify-center rounded-md border border-dashed text-muted-foreground">
                                     <div className="text-center">
                                         <config.icon className="mx-auto h-12 w-12 mb-2 opacity-50" />
-                                        <p>Insira dados e clique em "Converter" para ver o resultado</p>
+                                        <p>{t('insertDataConvertSeeResult')}</p>
                                     </div>
                                 </div>
                             )}

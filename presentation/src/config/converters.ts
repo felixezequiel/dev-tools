@@ -4,24 +4,39 @@ import { FormDataResult } from '@/components/common/results/FormDataResult'
 import { CsvResult } from '@/components/common/results/CsvResult'
 import { DBMigrationResult } from '@/components/common/results/DBMigrationResult'
 import { FileText, Table, Database, FileCode, FileJson, FileSpreadsheet } from 'lucide-react'
+import { translations } from '@/lib/i18n'
+
+// Helper function to get translated tool names at runtime
+export const getTranslatedToolName = (key: string): string => {
+    if (typeof window !== 'undefined') {
+        const lang = localStorage.getItem('language') || 'pt_BR'
+        return translations[lang as keyof typeof translations]?.[key as keyof typeof translations[keyof typeof translations]] as string || key
+    }
+    return translations.pt_BR?.[key as keyof typeof translations.pt_BR] as string || key
+}
+
+// For static config, use Portuguese as default
+const getToolName = (key: string): string => {
+    return translations.pt_BR?.[key as keyof typeof translations.pt_BR] as string || key
+}
 
 export const converterConfigs: Record<string, DataConverterConfig> = {
     json: {
-        title: 'Converter para JSON',
-        description: 'Converte dados estruturados (chave-valor, JSON, CSV) em objetos JSON organizados com validação em tempo real',
+        title: getToolName('convertToJson'),
+        description: getToolName('convertToJson_desc'),
         inputTypes: ['formdata', 'curl', 'json', 'csv', 'yaml', 'xml', 'openapi', 'json-schema', 'sql'] as InputType[],
         defaultInputType: 'json' as InputType,
         outputFormat: 'json',
-        outputDescription: 'JSON estruturado gerado a partir dos dados de entrada',
+        outputDescription: 'JSON',
         acceptedFileTypes: ['.json', '.csv', '.yaml', '.yml', '.xml', '.sql', '.txt', '.tsv', '.ts'],
         placeholder: 'Arraste um arquivo JSON, CSV, YAML, XML, SQL ou TXT aqui',
         icon: FileText,
         usage: {
-            summary: 'Use quando precisar normalizar diferentes formatos (CSV, YAML, XML, key=value) para um JSON único para integrações e testes.',
+            summary: 'json_usage_summary',
             useCases: [
                 {
-                    title: 'Centralizar dados de configuração',
-                    description: 'Transformar YAML/XML de configuração em JSON para consumo por front-ends e pipelines.',
+                    title: 'json_usecase_centralize_title',
+                    description: 'json_usecase_centralize_desc',
                     exampleInput: 'user.name=John\nuser.age=30',
                     exampleOutput: '{\n  "user.name": "John",\n  "user.age": "30"\n}'
                 }
@@ -29,22 +44,22 @@ export const converterConfigs: Record<string, DataConverterConfig> = {
         }
     },
     csv: {
-        title: 'Converter para CSV',
-        description: 'Transforma dados estruturados em arquivos CSV com formatação adequada e escape de caracteres especiais',
+        title: getToolName('convertToCsv'),
+        description: getToolName('convertToCsv_desc'),
         inputTypes: ['formdata', 'curl', 'json', 'csv', 'yaml', 'xml', 'openapi', 'json-schema', 'sql'] as InputType[],
         defaultInputType: 'json' as InputType,
         outputFormat: 'csv',
-        outputDescription: 'CSV estruturado gerado a partir dos dados de entrada',
+        outputDescription: 'CSV',
         acceptedFileTypes: ['.json', '.csv', '.yaml', '.yml', '.xml', '.sql', '.txt', '.tsv', '.ts'],
         placeholder: 'Arraste um arquivo JSON, CSV, YAML, XML, SQL ou TXT aqui',
         icon: Table,
         ResultComponent: CsvResult as any,
         usage: {
-            summary: 'Quando você precisa gerar CSV para importar em planilhas ou ferramentas de BI a partir de dados variados.',
+            summary: 'csv_usage_summary',
             useCases: [
                 {
-                    title: 'Exportar para Excel/Sheets',
-                    description: 'Converter respostas JSON em CSV para análise rápida.',
+                    title: 'csv_usecase_export_title',
+                    description: 'csv_usecase_export_desc',
                     exampleInput: '{"name":"John","age":30}',
                     exampleOutput: 'name,age\nJohn,30'
                 }
@@ -52,22 +67,22 @@ export const converterConfigs: Record<string, DataConverterConfig> = {
         }
     },
     formdata: {
-        title: 'Converter para FormData',
-        description: 'Converte dados estruturados em FormData para envio de formulários web com preview interativo',
+        title: getToolName('convertToFormData'),
+        description: getToolName('convertToFormData_desc'),
         inputTypes: ['formdata', 'curl', 'json', 'csv', 'yaml', 'xml', 'openapi', 'json-schema', 'sql'] as InputType[],
         defaultInputType: 'json' as InputType,
         outputFormat: 'formdata',
-        outputDescription: 'FormData estruturado gerado a partir dos dados de entrada',
+        outputDescription: 'FormData',
         acceptedFileTypes: ['.json', '.csv', '.yaml', '.yml', '.xml', '.sql', '.txt', '.tsv', '.ts'],
         placeholder: 'Arraste um arquivo JSON, CSV, YAML, XML, SQL ou TXT aqui',
         icon: Database,
         ResultComponent: FormDataResult,
         usage: {
-            summary: 'Ideal para simular envios de formulários e testar endpoints que recebem multipart/form-data.',
+            summary: 'formdata_usage_summary',
             useCases: [
                 {
-                    title: 'Simular envio de formulário',
-                    description: 'Crie rapidamente um FormData a partir de JSON/CSV e visualize as chaves e valores enviados.',
+                    title: 'formdata_usecase_simulate_title',
+                    description: 'formdata_usecase_simulate_desc',
                     exampleInput: '{"user.name":"John","user.age":30}',
                     exampleOutput: 'user.name=John\nuser.age=30'
                 }
@@ -75,21 +90,21 @@ export const converterConfigs: Record<string, DataConverterConfig> = {
         }
     },
     xml: {
-        title: 'Converter para XML',
-        description: 'Transforma dados estruturados em XML com suporte a atributos e hierarquia',
+        title: getToolName('convertToXml'),
+        description: getToolName('convertToXml_desc'),
         inputTypes: ['formdata', 'curl', 'json', 'csv', 'yaml', 'xml', 'openapi', 'json-schema', 'sql'] as InputType[],
         defaultInputType: 'json' as InputType,
         outputFormat: 'xml',
-        outputDescription: 'XML gerado a partir dos dados de entrada',
+        outputDescription: 'XML',
         acceptedFileTypes: ['.json', '.csv', '.yaml', '.yml', '.xml', '.sql', '.txt', '.tsv', '.ts'],
         placeholder: 'Arraste um arquivo JSON, CSV, YAML, XML, SQL ou TXT aqui',
         icon: FileCode,
         usage: {
-            summary: 'Gera XML para integrações legadas, configurações ou serviços que exigem este formato.',
+            summary: 'xml_usage_summary',
             useCases: [
                 {
-                    title: 'Exportar para sistemas legados',
-                    description: 'Transformar JSON em XML com hierarquia para consumo por serviços antigos.',
+                    title: 'xml_usecase_legacy_title',
+                    description: 'xml_usecase_legacy_desc',
                     exampleInput: '{"user":{"name":"John","age":30}}',
                     exampleOutput: '<user>\n  <name>John</name>\n  <age>30</age>\n</user>'
                 }
@@ -97,21 +112,21 @@ export const converterConfigs: Record<string, DataConverterConfig> = {
         }
     },
     yaml: {
-        title: 'Converter para YAML',
-        description: 'Converte dados para YAML legível para configurações e dados estruturados',
+        title: getToolName('convertToYaml'),
+        description: getToolName('convertToYaml_desc'),
         inputTypes: ['formdata', 'curl', 'json', 'csv', 'yaml', 'xml', 'openapi', 'json-schema', 'sql'] as InputType[],
         defaultInputType: 'json' as InputType,
         outputFormat: 'yaml',
-        outputDescription: 'YAML gerado a partir dos dados de entrada',
+        outputDescription: 'YAML',
         acceptedFileTypes: ['.json', '.csv', '.yaml', '.yml', '.xml', '.sql', '.txt', '.tsv', '.ts'],
         placeholder: 'Arraste um arquivo JSON, CSV, YAML, XML, SQL ou TXT aqui',
         icon: FileCode,
         usage: {
-            summary: 'Ideal para gerar arquivos de configuração YAML a partir de dados JSON ou chave=valor.',
+            summary: 'yaml_usage_summary',
             useCases: [
                 {
-                    title: 'Gerar configs de serviços',
-                    description: 'Converter JSON de configuração em YAML para Kubernetes, GitHub Actions, etc.',
+                    title: 'yaml_usecase_configs_title',
+                    description: 'yaml_usecase_configs_desc',
                     exampleInput: '{"service":{"replicas":2}}',
                     exampleOutput: 'service:\n  replicas: 2'
                 }
@@ -119,21 +134,21 @@ export const converterConfigs: Record<string, DataConverterConfig> = {
         }
     },
     'json-schema': {
-        title: 'Converter para JSON Schema',
-        description: 'Gera schemas JSON automaticamente para validação de dados',
+        title: getToolName('convertToJsonSchema'),
+        description: getToolName('convertToJsonSchema_desc'),
         inputTypes: ['formdata', 'curl', 'json', 'csv', 'yaml', 'xml', 'openapi', 'json-schema', 'sql'] as InputType[],
         defaultInputType: 'json' as InputType,
         outputFormat: 'json-schema',
-        outputDescription: 'JSON Schema baseado nos dados de entrada',
+        outputDescription: 'JSON Schema',
         acceptedFileTypes: ['.json', '.csv', '.yaml', '.yml', '.xml', '.sql', '.txt', '.tsv', '.ts'],
         placeholder: 'Arraste um arquivo JSON, CSV, YAML, XML, SQL ou TXT aqui',
         icon: FileJson,
         usage: {
-            summary: 'Crie rapidamente um schema para validar payloads e contratos de API a partir de exemplos.',
+            summary: 'jsonschema_usage_summary',
             useCases: [
                 {
-                    title: 'Validar payloads em pipelines',
-                    description: 'Gerar JSON Schema para validar arquivos de dados em CI/CD.',
+                    title: 'jsonschema_usecase_ci_title',
+                    description: 'jsonschema_usecase_ci_desc',
                     exampleInput: '{"id": 1, "name": "John"}',
                     exampleOutput: '{\n  "$schema": "https://json-schema.org/draft/2020-12/schema",\n  "type": "object",\n  "properties": {"id": {"type": "number"}, "name": {"type": "string"}}\n}'
                 }
@@ -141,21 +156,21 @@ export const converterConfigs: Record<string, DataConverterConfig> = {
         }
     },
     openapi: {
-        title: 'Converter para OpenAPI',
-        description: 'Gera especificações OpenAPI a partir de exemplos de dados',
+        title: getToolName('convertToOpenApi'),
+        description: getToolName('convertToOpenApi_desc'),
         inputTypes: ['formdata', 'curl', 'json', 'csv', 'yaml', 'xml', 'openapi', 'json-schema', 'sql'] as InputType[],
         defaultInputType: 'json' as InputType,
         outputFormat: 'openapi',
-        outputDescription: 'OpenAPI Specification (JSON) gerada a partir dos dados',
+        outputDescription: 'OpenAPI',
         acceptedFileTypes: ['.json', '.csv', '.yaml', '.yml', '.xml', '.sql', '.txt', '.tsv', '.ts'],
         placeholder: 'Arraste um arquivo JSON, CSV, YAML, XML, SQL ou TXT aqui',
         icon: FileJson,
         usage: {
-            summary: 'Gere rapidamente uma especificação OpenAPI a partir de exemplos para documentar e testar APIs.',
+            summary: 'openapi_usage_summary',
             useCases: [
                 {
-                    title: 'Documentar endpoints',
-                    description: 'Converter exemplos de requests/responses em um esqueleto OpenAPI.',
+                    title: 'openapi_usecase_docs_title',
+                    description: 'openapi_usecase_docs_desc',
                     exampleInput: '{"GET /users": {"200": [{"id":1}]}}',
                     exampleOutput: '{"openapi":"3.0.0","paths":{"/users":{"get":{"responses":{"200":{"content":{"application/json":{"schema":{"type":"array"}}}}}}}}}'
                 }
@@ -163,21 +178,21 @@ export const converterConfigs: Record<string, DataConverterConfig> = {
         }
     },
     sql: {
-        title: 'Converter para SQL',
-        description: 'Gera scripts SQL (INSERT, UPDATE ou CREATE TABLE)',
+        title: getToolName('convertToSql'),
+        description: getToolName('convertToSql_desc'),
         inputTypes: ['formdata', 'curl', 'json', 'csv', 'yaml', 'xml', 'openapi', 'json-schema', 'sql'] as InputType[],
         defaultInputType: 'json' as InputType,
         outputFormat: 'sql',
-        outputDescription: 'Script SQL gerado a partir dos dados',
+        outputDescription: 'SQL',
         acceptedFileTypes: ['.json', '.csv', '.yaml', '.yml', '.xml', '.sql', '.txt', '.tsv', '.ts'],
         placeholder: 'Arraste um arquivo JSON, CSV, YAML, XML, SQL ou TXT aqui',
         icon: FileSpreadsheet,
         usage: {
-            summary: 'Produza INSERT/UPDATE/CREATE TABLE para popular bancos ou preparar migrações a partir de JSON/CSV.',
+            summary: 'sql_usage_summary',
             useCases: [
                 {
-                    title: 'Popular ambiente de desenvolvimento',
-                    description: 'Gerar INSERTs a partir de fixtures JSON.',
+                    title: 'sql_usecase_seed_title',
+                    description: 'sql_usecase_seed_desc',
                     exampleInput: '{"users":[{"id":1,"name":"John"}]}',
                     exampleOutput: 'INSERT INTO users (id,name) VALUES (1,\'John\');'
                 }
@@ -185,22 +200,22 @@ export const converterConfigs: Record<string, DataConverterConfig> = {
         }
     },
     'database-migration': {
-        title: 'Converter para Database Migration',
-        description: 'Gera scripts de migração (UP/DOWN) com suporte a seed data',
+        title: getToolName('convertToDatabaseMigration'),
+        description: getToolName('convertToDatabaseMigration_desc'),
         inputTypes: ['formdata', 'curl', 'json', 'csv', 'yaml', 'xml', 'openapi', 'json-schema', 'sql'] as InputType[],
         defaultInputType: 'json' as InputType,
         outputFormat: 'db-migration',
-        outputDescription: 'Scripts de migração gerados a partir dos dados',
+        outputDescription: 'Database Migration',
         acceptedFileTypes: ['.json', '.csv', '.yaml', '.yml', '.xml', '.sql', '.txt', '.tsv', '.ts'],
         placeholder: 'Arraste um arquivo JSON, CSV, YAML, XML, SQL ou TXT aqui',
         icon: Database,
         ResultComponent: DBMigrationResult,
         usage: {
-            summary: 'Crie migrações UP/DOWN e dados de seed a partir de exemplos, agilizando prototipação.',
+            summary: 'dbmig_usage_summary',
             useCases: [
                 {
-                    title: 'Esqueleto de migração rápida',
-                    description: 'Gerar CREATE TABLE e seeds iniciais a partir de JSON.',
+                    title: 'dbmig_usecase_skeleton_title',
+                    description: 'dbmig_usecase_skeleton_desc',
                     exampleInput: '{"users":[{"id":1,"name":"John"}]}',
                     exampleOutput: '-- up\nCREATE TABLE users (id INT, name TEXT);\n-- down\nDROP TABLE users;'
                 }

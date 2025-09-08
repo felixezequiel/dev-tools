@@ -1,4 +1,10 @@
 import { FileText, Sparkles } from 'lucide-react'
+import { translations } from '@/lib/i18n'
+
+// Helper function to get translated tool names
+const getToolName = (key: string): string => {
+    return translations.pt_BR?.[key as keyof typeof translations.pt_BR] as string || key
+}
 
 export interface DataGeneratorConfig {
     title: string
@@ -17,8 +23,8 @@ export interface DataGeneratorConfig {
 
 export const generatorConfigs: Record<string, DataGeneratorConfig> = {
     'types-zod': {
-        title: 'Types/Zod',
-        description: 'Gere tipos TS e schemas Zod a partir de JSON',
+        title: getToolName('typesZodGenerator'),
+        description: getToolName('typesZodGenerator_desc'),
         icon: FileText,
         usage: {
             summary: 'Gere automaticamente tipos TypeScript e schemas Zod para validação a partir de dados JSON.',
@@ -33,8 +39,8 @@ export const generatorConfigs: Record<string, DataGeneratorConfig> = {
         }
     },
     'mock-data': {
-        title: 'Mock/Data',
-        description: 'Gere mocks a partir de JSON Schema ou OpenAPI em JSON/CSV/SQL',
+        title: getToolName('mockDataGenerator'),
+        description: getToolName('mockDataGenerator_desc'),
         icon: Sparkles,
         usage: {
             summary: 'Gere dados de teste rapidamente a partir de schemas JSON ou especificações OpenAPI.',

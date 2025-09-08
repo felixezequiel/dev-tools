@@ -60,8 +60,6 @@ Epic-TESTEBISPO
         const pipeline = rebuilder.rebuildFrom(entrySource);
         const result = pipeline.toJSON();
 
-        console.log('Result:', JSON.stringify(result, null, 2));
-
         // Expected structure
         expect(result.storyCreator.type).toBe('Agile');
         expect(result.storyCreator.subType).toBe('Config');

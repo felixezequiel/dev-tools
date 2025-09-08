@@ -16,6 +16,7 @@ import {
     Loader2
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { useTranslation } from '@/lib/i18n'
 
 export interface FileDropzoneProps {
     onFileSelect: (file: File, content: string) => void
@@ -66,6 +67,7 @@ export function FileDropzone({
     className,
     disabled = false
 }: FileDropzoneProps) {
+    const { t } = useTranslation()
     const [selectedFile, setSelectedFile] = useState<File | null>(null)
     const [isProcessing, setIsProcessing] = useState(false)
     const [error, setError] = useState<string | null>(null)
@@ -82,7 +84,7 @@ export function FileDropzone({
             setSelectedFile(file)
             onFileSelect(file, content)
         } catch (err) {
-            setError('Erro ao ler o arquivo')
+            setError(t('readFileError'))
             console.error('Erro ao ler arquivo:', err)
         } finally {
             setIsProcessing(false)
@@ -144,14 +146,14 @@ export function FileDropzone({
                                     <p className="text-sm font-medium">
                                         {isDragActive
                                             ? isDragReject
-                                                ? "Tipo de arquivo não suportado"
-                                                : "Solte o arquivo aqui"
+                                                ? t('unsupportedFile')
+                                                : t('dropHere')
                                             : placeholder
                                         }
                                     </p>
                                     <p className="text-xs text-muted-foreground">
-                                        Tipos aceitos: {acceptedFileTypes.join(', ')}
-                                        {' • '} Máximo: {formatFileSize(maxSize)}
+                                        {t('acceptedTypes')}: {acceptedFileTypes.join(', ')}
+                                        {' • '} {t('maxSize')}: {formatFileSize(maxSize)}
                                     </p>
                                 </div>
 
@@ -162,7 +164,7 @@ export function FileDropzone({
                                     className="mt-4"
                                     disabled={disabled}
                                 >
-                                    Selecionar Arquivo
+                                    {t('selectFile')}
                                 </Button>
                             </CardContent>
                         </Card>
@@ -224,14 +226,14 @@ export function FileDropzone({
                                         {isProcessing && (
                                             <div className="flex items-center space-x-2 mt-2 text-muted-foreground">
                                                 <Loader2 className="h-4 w-4 animate-spin" />
-                                                <span className="text-xs">Processando arquivo...</span>
+                                                <span className="text-xs">{t('processingFile')}</span>
                                             </div>
                                         )}
 
                                         {!isProcessing && !error && (
                                             <div className="flex items-center space-x-2 mt-2 text-green-600">
                                                 <CheckCircle className="h-4 w-4" />
-                                                <span className="text-xs">Arquivo carregado com sucesso</span>
+                                                <span className="text-xs">{t('fileLoadedSuccess')}</span>
                                             </div>
                                         )}
                                     </div>

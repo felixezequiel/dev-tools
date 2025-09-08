@@ -7,10 +7,6 @@ export function DatabaseMigrationConverterPage() {
     return (
         <DataConverterLayout
             config={config}
-            breadcrumbs={[
-                { label: 'Página Inicial', path: '/' },
-                { label: 'Converter para Database Migration', isActive: true }
-            ]}
         />
     )
 }

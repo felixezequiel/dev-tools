@@ -93,7 +93,7 @@ function createMultipartFormDataEntrySource(input: string): KeyValuePairsEntrySo
     const lines = input.split('\n')
     let currentField = ''
     let currentValue = ''
-    let inValueSection = false
+
 
     for (let i = 0; i < lines.length; i++) {
         const line = lines[i].trim()
@@ -110,7 +110,6 @@ function createMultipartFormDataEntrySource(input: string): KeyValuePairsEntrySo
             if (nameMatch) {
                 currentField = nameMatch[1]
                 currentValue = ''
-                inValueSection = false
             }
         }
         // Skip other headers and empty lines
@@ -119,7 +118,7 @@ function createMultipartFormDataEntrySource(input: string): KeyValuePairsEntrySo
         }
         // This is the value content
         else if (currentField) {
-            inValueSection = true
+
             if (currentValue) {
                 currentValue += '\n' + line
             } else {

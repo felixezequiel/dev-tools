@@ -16,12 +16,14 @@ import { createEntrySource, inputFormats } from '@/lib/entrySources'
 import type { InputType } from '@/config/data-support'
 import { copyToClipboard } from '@/lib/utils'
 import { FileText, Copy, Check, AlertCircle, Zap, Eye, EyeOff, Database } from 'lucide-react'
+import { useTranslation } from '@/lib/i18n'
 
 interface FormDataConverterLayoutProps {
     breadcrumbs: Array<{ label: string; path?: string; isActive?: boolean }>
 }
 
 export function FormDataConverterLayout({ breadcrumbs }: FormDataConverterLayoutProps) {
+    const { t } = useTranslation()
     const [input, setInput] = useState('')
     const [inputType, setInputType] = useState<InputType>('json')
     const [inputMode, setInputMode] = useState<'manual' | 'file'>('manual')
@@ -135,8 +137,8 @@ export function FormDataConverterLayout({ breadcrumbs }: FormDataConverterLayout
     return (
         <div className="space-y-6">
             <PageHeader
-                title="Converter para FormData"
-                description="Escolha o modo de entrada (Digitar ou Arquivo) e o tipo de formato abaixo para inserir seus dados e gerar um FormData com preview."
+                title={t('convertToFormData')}
+                description={t('inputSectionDescription')}
                 breadcrumbs={breadcrumbs}
             />
 
@@ -153,89 +155,89 @@ export function FormDataConverterLayout({ breadcrumbs }: FormDataConverterLayout
                                 <div>
                                     <CardTitle className="flex items-center space-x-2">
                                         <FileText className="h-5 w-5" />
-                                        <span>Dados de Entrada</span>
+                                        <span>{t('inputData')}</span>
                                     </CardTitle>
                                     <CardDescription>
-                                        Escolha o modo de entrada (Digitar ou Arquivo) e o tipo de formato abaixo para inserir seus dados.
+                                        {t('inputSectionDescription')}
                                     </CardDescription>
                                 </div>
                             </div>
                         </CardHeader>
                         <CardContent>
                             <div className="space-y-6">
-                            {/* Passo 1: Tipo de entrada */}
-                            <SectionHeading step={1} title="Escolha o tipo de dados" description="Selecione o formato que melhor representa seus dados." />
-                            <div className="space-y-2">
-                                <InputTypeButtons
-                                    allowedTypes={['formdata', 'json', 'csv', 'yaml', 'xml', 'openapi', 'json-schema', 'sql'] as any}
-                                    current={inputType}
-                                    onChange={handleInputTypeChange}
-                                />
-                            </div>
-
-                            {/* Passo 2: Modo */}
-                            <SectionHeading step={2} title="Escolha como inserir" description="Digite manualmente ou envie um arquivo." />
-                            <div className="space-y-2">
-                                <InputModeToggle mode={inputMode} onChange={handleInputModeChange} />
-                            </div>
-
-                            {/* Dica do formato atual */}
-                            <div className="text-xs text-muted-foreground"><p>{inputFormats[inputType].description}</p></div>
-
-                            {/* Passo 3: Inserção de dados */}
-                            <SectionHeading step={3} title="Insira os dados" description="Cole ou digite os dados conforme o formato selecionado." />
-                            {inputMode === 'manual' ? (
-                                <>
-                                    <TextareaWithValidation
-                                        placeholder={inputFormats[inputType].placeholder}
-                                        value={input}
-                                        onChange={handleInputChange}
-                                        onValidate={validateInput}
-                                        successMessage="Formato válido"
-                                        className="min-h-[300px] font-mono text-sm"
+                                {/* Passo 1: Tipo de entrada */}
+                                <SectionHeading step={1} title={t('chooseDataType')} description={t('chooseDataTypeDesc')} />
+                                <div className="space-y-2">
+                                    <InputTypeButtons
+                                        allowedTypes={['formdata', 'json', 'csv', 'yaml', 'xml', 'openapi', 'json-schema', 'sql'] as any}
+                                        current={inputType}
+                                        onChange={handleInputTypeChange}
                                     />
-                                    <Button variant="outline" size="sm" onClick={() => setInput(inputFormats[inputType].example)}>
-                                        Carregar Exemplo
-                                    </Button>
-                                </>
-                            ) : (
-                                <FileDropzone
-                                    onFileSelect={handleFileSelect}
-                                    onFileRemove={handleFileRemove}
-                                    acceptedFileTypes={['.json', '.csv', '.yaml', '.yml', '.xml', '.sql', '.txt', '.tsv', '.ts']}
-                                    placeholder="Arraste um arquivo JSON, CSV, YAML, XML, SQL ou TXT aqui"
-                                />
-                            )}
-
-                            <div className="flex items-center justify-between">
-                                <div className="text-sm text-muted-foreground">
-                                    {input.split('\n').filter(line => line.trim()).length} linhas
                                 </div>
-                                <Button
-                                    onClick={handleConvert}
-                                    disabled={
-                                        (!input.trim() && !uploadedFile) ||
-                                        isBuilding ||
-                                        (inputMode === 'manual' && inputValidation.hasErrors)
-                                    }
-                                    loading={isBuilding}
-                                    variant={
-                                        (inputMode === 'manual' && inputValidation.hasErrors) ||
-                                            (!input.trim() && !uploadedFile)
-                                            ? "destructive"
-                                            : "default"
-                                    }
-                                >
-                                    <Zap className="mr-2 h-4 w-4" />
-                                    {
-                                        inputMode === 'manual' && inputValidation.hasErrors
-                                            ? "Corrigir Erros"
-                                            : (!input.trim() && !uploadedFile)
-                                                ? "Selecione Dados"
-                                                : "Converter para FormData"
-                                    }
-                                </Button>
-                            </div>
+
+                                {/* Passo 2: Modo */}
+                                <SectionHeading step={2} title={t('chooseHowToInsert')} description={t('chooseHowToInsertDesc')} />
+                                <div className="space-y-2">
+                                    <InputModeToggle mode={inputMode} onChange={handleInputModeChange} />
+                                </div>
+
+                                {/* Dica do formato atual */}
+                                <div className="text-xs text-muted-foreground"><p>{inputFormats[inputType].description}</p></div>
+
+                                {/* Passo 3: Inserção de dados */}
+                                <SectionHeading step={3} title={t('insertData')} description={t('insertDataDesc')} />
+                                {inputMode === 'manual' ? (
+                                    <>
+                                        <TextareaWithValidation
+                                            placeholder={inputFormats[inputType].placeholder}
+                                            value={input}
+                                            onChange={handleInputChange}
+                                            onValidate={validateInput}
+                                            successMessage={t('validFormat')}
+                                            className="min-h-[300px] font-mono text-sm"
+                                        />
+                                        <Button variant="outline" size="sm" onClick={() => setInput(inputFormats[inputType].example)}>
+                                            {t('loadExample')}
+                                        </Button>
+                                    </>
+                                ) : (
+                                    <FileDropzone
+                                        onFileSelect={handleFileSelect}
+                                        onFileRemove={handleFileRemove}
+                                        acceptedFileTypes={['.json', '.csv', '.yaml', '.yml', '.xml', '.sql', '.txt', '.tsv', '.ts']}
+                                        placeholder="Arraste um arquivo JSON, CSV, YAML, XML, SQL ou TXT aqui"
+                                    />
+                                )}
+
+                                <div className="flex items-center justify-between">
+                                    <div className="text-sm text-muted-foreground">
+                                        {input.split('\n').filter(line => line.trim()).length} {t('lines')}
+                                    </div>
+                                    <Button
+                                        onClick={handleConvert}
+                                        disabled={
+                                            (!input.trim() && !uploadedFile) ||
+                                            isBuilding ||
+                                            (inputMode === 'manual' && inputValidation.hasErrors)
+                                        }
+                                        loading={isBuilding}
+                                        variant={
+                                            (inputMode === 'manual' && inputValidation.hasErrors) ||
+                                                (!input.trim() && !uploadedFile)
+                                                ? "destructive"
+                                                : "default"
+                                        }
+                                    >
+                                        <Zap className="mr-2 h-4 w-4" />
+                                        {
+                                            inputMode === 'manual' && inputValidation.hasErrors
+                                                ? t('fixErrors')
+                                                : (!input.trim() && !uploadedFile)
+                                                    ? t('selectData')
+                                                    : `${t('convertTo')} FormData`
+                                        }
+                                    </Button>
+                                </div>
                             </div>
                         </CardContent>
                     </Card>
@@ -289,7 +291,7 @@ export function FormDataConverterLayout({ breadcrumbs }: FormDataConverterLayout
                             {result?.success ? (
                                 <div className="space-y-4">
                                     <div className="flex items-center space-x-2">
-                                        <Badge variant="success">Sucesso</Badge>
+                                        <Badge variant="success">{t('success')}</Badge>
                                         {result.executionTime && (
                                             <span className="text-sm text-muted-foreground">
                                                 {result.executionTime.toFixed(2)}ms
@@ -312,7 +314,7 @@ export function FormDataConverterLayout({ breadcrumbs }: FormDataConverterLayout
                                                 </div>
                                                 <div>
                                                     <p className="text-lg font-medium text-primary">
-                                                        FormData criado com sucesso!
+                                                        FormData {t('success').toLowerCase()}!
                                                     </p>
                                                     <p className="text-sm text-muted-foreground mt-1">
                                                         {getFormDataPreview(result.data as FormData).length} campos processados
@@ -401,7 +403,7 @@ export function FormDataConverterLayout({ breadcrumbs }: FormDataConverterLayout
                                 <div className="flex items-center space-x-2 rounded-md border border-destructive/50 bg-destructive/5 p-4">
                                     <AlertCircle className="h-5 w-5 text-destructive" />
                                     <div>
-                                        <p className="font-medium text-destructive">Erro na conversão</p>
+                                        <p className="font-medium text-destructive">{t('conversionError')}</p>
                                         <p className="text-sm text-muted-foreground">{result.error}</p>
                                     </div>
                                 </div>
@@ -409,7 +411,7 @@ export function FormDataConverterLayout({ breadcrumbs }: FormDataConverterLayout
                                 <div className="flex h-[300px] items-center justify-center rounded-md border border-dashed text-muted-foreground">
                                     <div className="text-center">
                                         <Database className="mx-auto h-12 w-12 mb-2 opacity-50" />
-                                        <p>Insira dados e clique em "Converter para FormData" para ver o resultado</p>
+                                        <p>{t('insertDataConvertSeeResult')}</p>
                                     </div>
                                 </div>
                             )}

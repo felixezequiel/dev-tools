@@ -1,4 +1,10 @@
 import { Sparkles } from 'lucide-react'
+import { translations } from '@/lib/i18n'
+
+// Helper function to get translated tool names
+const getToolName = (key: string): string => {
+    return translations.pt_BR?.[key as keyof typeof translations.pt_BR] as string || key
+}
 
 export interface DataComparatorConfig {
     title: string
@@ -17,8 +23,8 @@ export interface DataComparatorConfig {
 
 export const comparatorConfigs: Record<string, DataComparatorConfig> = {
     comparator: {
-        title: 'Comparador de Dados',
-        description: 'Compare JSON e texto, detectando caracteres invisíveis',
+        title: getToolName('dataComparator'),
+        description: getToolName('dataComparator_desc'),
         icon: Sparkles,
         usage: {
             summary: 'Use para comparar dados JSON, detectar diferenças sutis e identificar caracteres invisíveis.',

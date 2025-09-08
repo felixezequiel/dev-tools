@@ -1,50 +1,53 @@
 import { motion } from 'framer-motion'
 import { ToolCard } from '@/components/common/ToolCard'
-import { PageHeader } from '@/components/layout/PageHeader'
 import { Badge } from '@/components/ui/Badge'
 import { Zap, Shield, Sparkles } from 'lucide-react'
 import { acceptedInputTypes, supportedOutputs } from '@/config/supported'
 import type { Tool } from '@/types'
-import { devTools } from '@/config/tools'
-
-const allTools: Tool[] = devTools.map(t => ({
-    id: t.id,
-    name: t.name,
-    description: t.description,
-    iconComponent: t.icon,
-    path: t.path,
-    // map categories to existing Tool type categories for badge display
-    category: t.category === 'converter' ? 'converter' : t.category === 'generator' ? 'formatter' : 'validator'
-}))
-
-const features = [
-    {
-        icon: Zap,
-        title: 'Conversão Poderosa',
-        description: 'Suporte completo aos transformadores do DataReBuilder com múltiplos formatos de entrada'
-    },
-    {
-        icon: Shield,
-        title: 'Processamento Seguro',
-        description: 'Todo processamento é feito localmente usando as classes do domínio robustas'
-    },
-    {
-        icon: Sparkles,
-        title: 'Interface Moderna',
-        description: 'Design elegante com validação em tempo real e feedback visual inteligente'
-    }
-]
+import { getTranslatedToolsFor } from '@/config/tools'
+import { useTranslation } from '@/lib/i18n'
+import { useHeader } from '@/components/layout/HeaderContext'
+import { useEffect } from 'react'
 
 export function HomePage() {
+    const { t } = useTranslation()
+    const { setHeader } = useHeader()
+
+    // Ensure header shows brand defaults on home, reacting to language changes
+    useEffect(() => {
+        setHeader(t('brandName'), t('modernToolsDescription'))
+    }, [t])
+
+    const allTools: Tool[] = getTranslatedToolsFor(t).map(tl => ({
+        id: tl.id,
+        name: tl.name,
+        description: tl.description,
+        iconComponent: tl.icon,
+        path: tl.path,
+        category: tl.category === 'converter' ? 'converter' : tl.category === 'generator' ? 'formatter' : 'validator'
+    }))
+
+    const features = [
+        {
+            icon: Zap,
+            title: t('powerfulConversion'),
+            description: t('powerfulConversionDesc')
+        },
+        {
+            icon: Shield,
+            title: t('secureProcessing'),
+            description: t('secureProcessingDesc')
+        },
+        {
+            icon: Sparkles,
+            title: t('modernInterface'),
+            description: t('modernInterfaceDesc')
+        }
+    ]
+
     const issuesUrl = (import.meta as any).env?.VITE_GITHUB_ISSUES_URL || 'https://github.com/felixezequiel/dev-tools/issues/new'
     return (
         <div className="space-y-8">
-            {/* Header */}
-            <PageHeader
-                title="DevTools"
-                description="Ferramentas modernas para conversão de dados"
-            />
-
             {/* Feedback / Issues (Top) */}
             <motion.div
                 initial={{ opacity: 0, y: 20 }}
@@ -54,12 +57,12 @@ export function HomePage() {
             >
                 <div className="flex items-center justify-between">
                     <div>
-                        <h3 className="text-lg font-semibold mb-1">Encontrou um problema?</h3>
-                        <p className="text-sm text-muted-foreground">Reporte diretamente nas issues do nosso GitHub. Seu feedback ajuda a melhorar a ferramenta.</p>
+                        <h3 className="text-lg font-semibold mb-1">{t('foundProblem')}</h3>
+                        <p className="text-sm text-muted-foreground">{t('reportOnGithub')}</p>
                     </div>
                     <a href={issuesUrl} target="_blank" rel="noopener noreferrer" className="inline-block">
                         <button className="inline-flex items-center rounded-md border px-3 py-2 text-sm hover:bg-muted">
-                            Abrir Issues
+                            {t('openIssues')}
                         </button>
                     </a>
                 </div>
@@ -72,29 +75,28 @@ export function HomePage() {
                 transition={{ duration: 0.5, delay: 0.2 }}
                 className="rounded-lg border bg-gradient-to-r from-primary/5 to-secondary/5 p-6"
             >
-                <h3 className="text-lg font-semibold mb-2">Como começar</h3>
+                <h3 className="text-lg font-semibold mb-2">{t('howToStart')}</h3>
                 <p className="text-muted-foreground mb-4">
-                    Escolha uma ferramenta abaixo para começar a converter seus dados.
-                    Cada ferramenta é especializada em um tipo específico de conversão.
+                    {t('chooseToolDescription')}
                 </p>
                 <div className="grid gap-4 md:grid-cols-3 text-sm">
                     <div className="flex items-center space-x-2">
                         <div className="flex h-6 w-6 items-center justify-center rounded-full bg-primary text-primary-foreground text-xs font-bold">
                             1
                         </div>
-                        <span>Escolha o formato de entrada (JSON, chave-valor, CSV)</span>
+                        <span>{t('chooseInputFormat')}</span>
                     </div>
                     <div className="flex items-center space-x-2">
                         <div className="flex h-6 w-6 items-center justify-center rounded-full bg-primary text-primary-foreground text-xs font-bold">
                             2
                         </div>
-                        <span>Insira os dados com validação em tempo real</span>
+                        <span>{t('enterDataValidation')}</span>
                     </div>
                     <div className="flex items-center space-x-2">
                         <div className="flex h-6 w-6 items-center justify-center rounded-full bg-primary text-primary-foreground text-xs font-bold">
                             3
                         </div>
-                        <span>Converta e baixe o resultado no formato desejado</span>
+                        <span>{t('convertDownloadResult')}</span>
                     </div>
                 </div>
             </motion.div>
@@ -131,8 +133,8 @@ export function HomePage() {
                 className="space-y-6"
             >
                 <div className="flex items-center justify-between">
-                    <h2 className="text-2xl font-bold tracking-tight">Ferramentas Disponíveis</h2>
-                    <Badge variant="secondary">{allTools.length} ferramentas</Badge>
+                    <h2 className="text-2xl font-bold tracking-tight">{t('availableTools')}</h2>
+                    <Badge variant="secondary">{t('toolsCount').replace('{{count}}', allTools.length.toString())}</Badge>
                 </div>
 
                 <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
@@ -157,7 +159,7 @@ export function HomePage() {
                 className="grid gap-6 md:grid-cols-2"
             >
                 <div className="rounded-lg border p-6 bg-card">
-                    <h3 className="text-lg font-semibold mb-3">Tipos de Entrada Aceitos</h3>
+                    <h3 className="text-lg font-semibold mb-3">{t('acceptedInputTypes')}</h3>
                     <div className="flex flex-wrap gap-2">
                         {acceptedInputTypes.map((t) => (
                             <span key={t.key} className="text-xs px-2 py-1 rounded-md bg-muted">
@@ -167,7 +169,7 @@ export function HomePage() {
                     </div>
                 </div>
                 <div className="rounded-lg border p-6 bg-card">
-                    <h3 className="text-lg font-semibold mb-3">Saídas Suportadas</h3>
+                    <h3 className="text-lg font-semibold mb-3">{t('supportedOutputs')}</h3>
                     <div className="flex flex-wrap gap-2">
                         {supportedOutputs.map((o) => (
                             <span key={o.key} className="text-xs px-2 py-1 rounded-md bg-muted">

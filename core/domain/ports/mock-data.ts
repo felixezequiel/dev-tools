@@ -1,4 +1,4 @@
-export type InternalSchemaType = 'object' | 'array' | 'string' | 'number' | 'boolean' | 'null';
+export type InternalSchemaType = 'object' | 'array' | 'string' | 'number' | 'boolean' | 'null' | 'union';
 
 export interface InternalSchemaBase {
     type: InternalSchemaType;
@@ -21,7 +21,8 @@ export interface InternalArraySchema extends InternalSchemaBase {
 export interface InternalStringSchema extends InternalSchemaBase {
     type: 'string';
     enum?: string[];
-    format?: 'email' | 'uri' | 'uuid' | 'date' | 'date-time';
+    format?: 'email' | 'uri' | 'uuid' | 'date' | 'date-time' | 'phone' | 'address' | 'company' | 'credit-card' | 'first-name' | 'last-name' | 'full-name' | 'job-title' | 'country' | 'city' | 'zip-code';
+    pattern?: string;
 }
 
 export interface InternalNumberSchema extends InternalSchemaBase {
@@ -37,13 +38,19 @@ export interface InternalNullSchema extends InternalSchemaBase {
     type: 'null';
 }
 
+export interface InternalUnionSchema extends InternalSchemaBase {
+    type: 'union';
+    variants: InternalSchema[];
+}
+
 export type InternalSchema =
     | InternalObjectSchema
     | InternalArraySchema
     | InternalStringSchema
     | InternalNumberSchema
     | InternalBooleanSchema
-    | InternalNullSchema;
+    | InternalNullSchema
+    | InternalUnionSchema;
 
 export interface SchemaLoader {
     loadFromJsonSchema(input: unknown): InternalSchema;
