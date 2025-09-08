@@ -1,6 +1,7 @@
 import type { ComponentType } from 'react'
 import { converterConfigs } from '@/config/converters'
-import { Sparkles, FileText } from 'lucide-react'
+import { comparatorConfigs } from '@/config/comparators'
+import { generatorConfigs } from '@/config/generators'
 
 export type ToolCategory = 'converter' | 'comparator' | 'generator'
 
@@ -23,41 +24,32 @@ const converterTools: DevToolConfig[] = Object.entries(converterConfigs).map(([k
     category: 'converter'
 }))
 
-const comparatorTool: DevToolConfig = {
-    id: 'comparator',
-    name: 'Comparador de Dados',
-    description: 'Compare JSON e texto, detectando caracteres invisíveis',
-    icon: Sparkles,
-    path: '/comparator',
+const comparatorTools: DevToolConfig[] = Object.entries(comparatorConfigs).map(([key, cfg]) => ({
+    id: key,
+    name: cfg.title,
+    description: cfg.description,
+    icon: cfg.icon,
+    path: `/${key}`,
     category: 'comparator',
     getComponent: () => import('@/pages/ComparatorPage').then(m => ({ default: m.ComparatorPage }))
-}
+}))
 
-const typesZodTool: DevToolConfig = {
-    id: 'types-zod',
-    name: 'Types/Zod',
-    description: 'Gere tipos TS e schemas Zod a partir de JSON',
-    icon: FileText,
-    path: '/types-zod',
+const generatorTools: DevToolConfig[] = Object.entries(generatorConfigs).map(([key, cfg]) => ({
+    id: key,
+    name: cfg.title,
+    description: cfg.description,
+    icon: cfg.icon,
+    path: `/${key}`,
     category: 'generator',
-    getComponent: () => import('@/pages/TypesZodPage').then(m => ({ default: m.TypesZodPage }))
-}
-
-const mockDataTool: DevToolConfig = {
-    id: 'mock-data',
-    name: 'Mock/Data',
-    description: 'Gere mocks a partir de JSON Schema ou OpenAPI em JSON/CSV/SQL',
-    icon: Sparkles,
-    path: '/mock-data',
-    category: 'generator',
-    getComponent: () => import('@pages/MockDataPage').then(m => ({ default: m.MockDataPage }))
-}
+    getComponent: () => key === 'types-zod'
+        ? import('@/pages/TypesZodPage').then(m => ({ default: m.TypesZodPage }))
+        : import('@pages/MockDataPage').then(m => ({ default: m.MockDataPage }))
+}))
 
 export const devTools: DevToolConfig[] = [
     ...converterTools,
-    comparatorTool,
-    typesZodTool,
-    mockDataTool
+    ...comparatorTools,
+    ...generatorTools
 ]
 
 

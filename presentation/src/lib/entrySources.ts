@@ -50,6 +50,10 @@ export class ArrayEntrySource<TValue> implements EntrySource<number, TValue> {
 export function createEntrySource(input: string, type: 'formdata' | 'curl' | 'json' | 'csv' | 'yaml' | 'xml' | 'openapi' | 'json-schema' | 'sql' = 'formdata'): EntrySource<any, any> {
     switch (type) {
         case 'formdata':
+            // Check if input is multipart FormData
+            if (isMultipartFormData(input)) {
+                return createMultipartFormDataEntrySource(input)
+            }
             // FormData textual input is treated as chave=valor lines
             return createKeyValueEntrySource(input)
         case 'curl': {
@@ -73,6 +77,63 @@ export function createEntrySource(input: string, type: 'formdata' | 'curl' | 'js
         default:
             return createKeyValueEntrySource(input)
     }
+}
+
+function isMultipartFormData(input: string): boolean {
+    // Check if input contains multipart boundary markers
+    return input.includes('Content-Disposition: form-data') &&
+        input.includes('------') &&
+        input.includes('name="')
+}
+
+function createMultipartFormDataEntrySource(input: string): KeyValuePairsEntrySource {
+    const pairs: Array<[string, string]> = []
+
+    // Split by boundary lines
+    const lines = input.split('\n')
+    let currentField = ''
+    let currentValue = ''
+    let inValueSection = false
+
+    for (let i = 0; i < lines.length; i++) {
+        const line = lines[i].trim()
+
+        // Check for Content-Disposition header
+        if (line.startsWith('Content-Disposition: form-data; name=')) {
+            // If we were collecting a previous field, save it
+            if (currentField && currentValue.trim()) {
+                pairs.push([currentField, currentValue.trim()])
+            }
+
+            // Extract field name
+            const nameMatch = line.match(/name="([^"]+)"/)
+            if (nameMatch) {
+                currentField = nameMatch[1]
+                currentValue = ''
+                inValueSection = false
+            }
+        }
+        // Skip other headers and empty lines
+        else if (line.startsWith('Content-') || line === '' || line.startsWith('------')) {
+            continue
+        }
+        // This is the value content
+        else if (currentField) {
+            inValueSection = true
+            if (currentValue) {
+                currentValue += '\n' + line
+            } else {
+                currentValue = line
+            }
+        }
+    }
+
+    // Don't forget the last field
+    if (currentField && currentValue.trim()) {
+        pairs.push([currentField, currentValue.trim()])
+    }
+
+    return new KeyValuePairsEntrySource(pairs)
 }
 
 function createKeyValueEntrySource(input: string): KeyValuePairsEntrySource {
@@ -330,6 +391,6 @@ export const inputFormats = {
         name: 'SQL',
         description: 'SQL (INSERT/CREATE TABLE simples serão normalizados)',
         example: 'INSERT INTO users (id,name) VALUES (1,\'John\');',
-        placeholder: 'INSERT INTO ...' 
+        placeholder: 'INSERT INTO ...'
     }
 }
