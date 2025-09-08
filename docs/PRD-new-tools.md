@@ -4,6 +4,8 @@
 - Types/Zod Generator: Domínio, aplicação e UI entregues (/types-zod), com registro centralizado em `presentation/src/config/tools.ts` (Home e Sidebar automáticas).
 - Comparadores: JSON/Text com Monaco Diff integrados; CSV com visualização em tabela.
 - Centralização de ferramentas: Home, Sidebar e Rotas geradas via `devTools`.
+- Mock/Data Generator (v1): Ports, implementações simples e UI entregue (/mock-data) – geração determinística com seed, N itens, CSV multi-linha, SQL com batch automático; ajuda inline para opções.
+- Consistência de Resultados: `SqlResult` criado e integrado ao `DataConverterLayout` (evita duplicação de status/ações; usa o mesmo padrão visual de CSV/JSON).
 
 ### Objetivo
 - Entregar duas novas ferramentas que acelerem o fluxo diário de devs:
@@ -145,12 +147,9 @@
 
 #### UI/UX (Presentation)
 - Rota: `/mock-data` registrada via `devTools`.
-- Coluna esquerda: Monaco editor com seletor (JSON Schema | OpenAPI), botão Validar.
-- Coluna central: Opções (seed, N, locale, batchSize, tableName, includeNulls).
-- Coluna direita: Tabs JSON/CSV/SQL
-  - JSON: CodeEditor read-only.
-  - CSV: `CsvResult` (Tabela/Bruto) com copiar/baixar.
-  - SQL: CodeEditor read-only com copiar/baixar.
+- Coluna esquerda: Monaco editor com seletor (JSON Schema | OpenAPI) e botões “Exemplo”/“Limpar”.
+- Abaixo do editor: Opções (seed com dica de determinismo, N com dica de quantidade, tableName com dica de uso no INSERT). Batch padrão = N.
+- Coluna direita: JSON (editor), CSV (`CsvResult` tabela/bruto), SQL (`SqlResult` com copiar/baixar). Dica para batch no cabeçalho de SQL.
 - Mensagens de erro compactas sob cada área.
 
 #### Aceitação/Qualidade
@@ -171,7 +170,7 @@
 1) Domínio: criar ports `SchemaLoader`, `DataFaker`, `CsvExporter`, `SqlInsertExporter`.
 2) Infra: `OpenApiToSchemaConverter`, `JsonSchemaValidator`, `FakerDataGenerator`, `DefaultCsvExporter`, `DefaultSqlInsertExporter`.
 3) Aplicação: `MockDataService` (composição e orquestração).
-4) Presentation: página `/mock-data`, registro em `devTools`, UI de opções/tabs, integração com `CsvResult`.
+4) Presentation: página `/mock-data`, registro em `devTools`, UI com editor + opções, integração com `CsvResult` e `SqlResult`.
 5) Testes: cobrir casos descritos; smoke de performance (tempo medido em teste não-bloqueante).
 6) Documentação: ajuda inline (tooltips) e exemplos de schema/spec.
 

@@ -5,6 +5,9 @@ import { Button } from '@/components/ui/Button'
 import { CodeEditor } from '@/components/common/ui/CodeEditor'
 import { MockDataService } from '@builder/data'
 import { CsvResult } from '@/components/common/results/CsvResult'
+import { SqlResult } from '@/components/common/results/SqlResult'
+import { Button as UIButton } from '@/components/ui/Button'
+import { Check, Copy } from 'lucide-react'
 
 export function MockDataPage() {
     const service = useMemo(() => new MockDataService(), [])
@@ -17,6 +20,7 @@ export function MockDataPage() {
     const [csv, setCsv] = useState('')
     const [sql, setSql] = useState('')
     const [error, setError] = useState<string | null>(null)
+    const [copiedJson, setCopiedJson] = useState(false)
 
     const sampleJsonSchema = useMemo(() => JSON.stringify({
         $schema: 'https://json-schema.org/draft/2020-12/schema',
@@ -122,8 +126,22 @@ export function MockDataPage() {
 
                 {/* Right: Output */}
                 <div className="space-y-4 lg:col-span-5">
-                    <Card className="p-3">
-                        <h3 className="font-semibold mb-2">JSON</h3>
+                    <Card className="p-3 space-y-2">
+                        <div className="flex items-center justify-between">
+                            <h3 className="font-semibold">JSON</h3>
+                            <UIButton
+                                variant="outline"
+                                size="sm"
+                                onClick={async () => {
+                                    await navigator.clipboard.writeText(JSON.stringify(json ?? [], null, 2))
+                                    setCopiedJson(true)
+                                    setTimeout(() => setCopiedJson(false), 1500)
+                                }}
+                                title="Copiar JSON"
+                            >
+                                {copiedJson ? <Check className="h-4 w-4 text-green-500" /> : <Copy className="h-4 w-4" />}
+                            </UIButton>
+                        </div>
                         <CodeEditor value={JSON.stringify(json ?? [], null, 2)} onChange={() => {}} readOnly language="json" height={300} />
                     </Card>
                     <Card className="p-3">
@@ -145,7 +163,22 @@ export function MockDataPage() {
                                 <span>Dica: aumente o batch para juntar INSERTs</span>
                             </div>
                         </div>
-                        <CodeEditor value={sql} onChange={() => {}} readOnly language="sql" height={300} />
+                        <SqlResult
+                            result={{ success: true, data: sql }}
+                            onCopy={async () => navigator.clipboard.writeText(sql)}
+                            onDownload={() => {
+                                const blob = new Blob([sql], { type: 'text/sql' })
+                                const url = URL.createObjectURL(blob)
+                                const a = document.createElement('a')
+                                a.href = url
+                                a.download = 'data.sql'
+                                a.click()
+                                URL.revokeObjectURL(url)
+                            }}
+                            version={1}
+                            updatedAt={Date.now()}
+                            justUpdated={false}
+                        />
                     </Card>
                 </div>
             </div>

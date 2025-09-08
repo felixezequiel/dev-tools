@@ -2,13 +2,19 @@ import { Badge } from '@/components/ui/Badge'
 import { Button } from '@/components/ui/Button'
 import { CodeEditor } from '@/components/common/ui/CodeEditor'
 import type { ResultRendererProps } from '@/types/converter'
-type SqlProps = Omit<ResultRendererProps, 'config' | 'input' | 'inputType'>
 import { Check, Copy, Download } from 'lucide-react'
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 
-export function SqlResult({ result, onCopy, onDownload, version, updatedAt, justUpdated }: SqlProps) {
+type JsonProps = Omit<ResultRendererProps, 'config' | 'input' | 'inputType'>
+
+export function JsonResult({ result, onCopy, onDownload, version, updatedAt, justUpdated }: JsonProps) {
     const [copied, setCopied] = useState(false)
-    const sql = typeof result?.data === 'string' ? result.data : String(result?.data ?? '')
+    const code = useMemo(() => {
+        if (!result?.success) return '[]'
+        const data = result.data
+        return typeof data === 'string' ? data : JSON.stringify(data ?? {}, null, 2)
+    }, [result])
+
     if (!result?.success) return null
 
     return (
@@ -30,20 +36,20 @@ export function SqlResult({ result, onCopy, onDownload, version, updatedAt, just
                             setCopied(true)
                             setTimeout(() => setCopied(false), 2000)
                         }}
-                        title="Copiar SQL"
+                        title="Copiar JSON"
                     >
                         {copied ? <Check className="h-4 w-4 text-green-500" /> : <Copy className="h-4 w-4" />}
                     </Button>
-                    <Button variant="outline" size="sm" onClick={onDownload} title="Baixar SQL">
+                    <Button variant="outline" size="sm" onClick={onDownload} title="Baixar JSON">
                         <Download className="h-4 w-4" />
                     </Button>
                 </div>
             </div>
-            <CodeEditor value={sql} onChange={() => {}} readOnly language="sql" height={360} />
+            <CodeEditor value={code} onChange={() => {}} readOnly language="json" height={360} />
         </div>
     )
 }
 
-export default SqlResult
+export default JsonResult
 
 

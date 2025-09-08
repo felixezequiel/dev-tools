@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/Button'
 import { TextareaWithValidation } from '@/components/ui/TextareaWithValidation'
 import { CodeEditor } from '@/components/common/ui/CodeEditor'
 import { SqlResult } from '@/components/common/results/SqlResult'
+import { JsonResult } from '@/components/common/results/JsonResult'
 import { FileDropzone } from '@/components/common/FileDropzone'
 import { Badge } from '@/components/ui/Badge'
 import { useConversion } from '@/hooks/useConversion'
@@ -272,7 +273,7 @@ export function DataConverterLayout({ config, breadcrumbs }: DataConverterLayout
                                         {config.outputDescription}
                                     </CardDescription>
                                 </div>
-                                {result?.success && !config.ResultComponent && !(config.outputFormat === 'sql' || config.outputFormat === 'sql-insert' || config.outputFormat === 'sql-update' || config.outputFormat === 'sql-create-table') && (
+                                {result?.success && !config.ResultComponent && !(config.outputFormat === 'sql' || config.outputFormat === 'sql-insert' || config.outputFormat === 'sql-update' || config.outputFormat === 'sql-create-table' || config.outputFormat === 'json') && (
                                     <div className="flex space-x-2">
                                         <Button variant="outline" size="sm" onClick={handleCopy}>
                                             {copied ? (
@@ -304,7 +305,7 @@ export function DataConverterLayout({ config, breadcrumbs }: DataConverterLayout
                                     />
                                 ) : (
                                     <div className="space-y-4">
-                                        {!(config.outputFormat === 'sql' || config.outputFormat === 'sql-insert' || config.outputFormat === 'sql-update' || config.outputFormat === 'sql-create-table') && (
+                                        {!(config.outputFormat === 'sql' || config.outputFormat === 'sql-insert' || config.outputFormat === 'sql-update' || config.outputFormat === 'sql-create-table' || config.outputFormat === 'json') && (
                                             <div className="flex items-center space-x-2">
                                                 <Badge variant="success">Sucesso</Badge>
                                                 {result.executionTime && (
@@ -348,8 +349,16 @@ export function DataConverterLayout({ config, breadcrumbs }: DataConverterLayout
                                         <div className="rounded-md border bg-muted/50 p-2">
                                             {(() => {
                                                 if (config.outputFormat === 'json') {
-                                                    const code = typeof result?.data === 'string' ? result.data : JSON.stringify(result?.data ?? {}, null, 2)
-                                                    return <CodeEditor value={code} onChange={() => {}} readOnly language="json" height={360} />
+                                                    return (
+                                                        <JsonResult
+                                                            result={result}
+                                                            onCopy={handleCopy}
+                                                            onDownload={handleDownload}
+                                                            version={version}
+                                                            updatedAt={updatedAt}
+                                                            justUpdated={justUpdated}
+                                                        />
+                                                    )
                                                 }
                                                 if (config.outputFormat === 'yaml') {
                                                     const code = typeof result?.data === 'string' ? result.data : (require('js-yaml') as any).dump(result?.data ?? {}, { indent: 2, lineWidth: 120 })
@@ -362,7 +371,6 @@ export function DataConverterLayout({ config, breadcrumbs }: DataConverterLayout
                                                 if (config.outputFormat === 'sql' || config.outputFormat === 'sql-insert' || config.outputFormat === 'sql-update' || config.outputFormat === 'sql-create-table') {
                                                     return (
                                                         <SqlResult
-                                                            config={config}
                                                             result={result}
                                                             onCopy={handleCopy}
                                                             onDownload={handleDownload}
