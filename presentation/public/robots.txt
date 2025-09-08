@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+Sitemap: https://dev-tools-presentation.vercel.app/sitemap.xml
+

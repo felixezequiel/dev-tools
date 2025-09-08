@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>https://dev-tools-presentation.vercel.app/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <!-- Converters -->
+  <url><loc>https://dev-tools-presentation.vercel.app/json-converter</loc></url>
+  <url><loc>https://dev-tools-presentation.vercel.app/how-to/json-converter</loc></url>
+  <url><loc>https://dev-tools-presentation.vercel.app/csv-converter</loc></url>
+  <url><loc>https://dev-tools-presentation.vercel.app/how-to/csv-converter</loc></url>
+  <url><loc>https://dev-tools-presentation.vercel.app/formdata-converter</loc></url>
+  <url><loc>https://dev-tools-presentation.vercel.app/how-to/formdata-converter</loc></url>
+  <url><loc>https://dev-tools-presentation.vercel.app/xml-converter</loc></url>
+  <url><loc>https://dev-tools-presentation.vercel.app/how-to/xml-converter</loc></url>
+  <url><loc>https://dev-tools-presentation.vercel.app/yaml-converter</loc></url>
+  <url><loc>https://dev-tools-presentation.vercel.app/how-to/yaml-converter</loc></url>
+  <url><loc>https://dev-tools-presentation.vercel.app/json-schema-converter</loc></url>
+  <url><loc>https://dev-tools-presentation.vercel.app/how-to/json-schema-converter</loc></url>
+  <url><loc>https://dev-tools-presentation.vercel.app/openapi-converter</loc></url>
+  <url><loc>https://dev-tools-presentation.vercel.app/how-to/openapi-converter</loc></url>
+  <url><loc>https://dev-tools-presentation.vercel.app/sql-converter</loc></url>
+  <url><loc>https://dev-tools-presentation.vercel.app/how-to/sql-converter</loc></url>
+  <url><loc>https://dev-tools-presentation.vercel.app/database-migration-converter</loc></url>
+  <url><loc>https://dev-tools-presentation.vercel.app/how-to/database-migration-converter</loc></url>
+  <!-- Comparator -->
+  <url><loc>https://dev-tools-presentation.vercel.app/comparator</loc></url>
+  <!-- Generators -->
+  <url><loc>https://dev-tools-presentation.vercel.app/types-zod</loc></url>
+  <url><loc>https://dev-tools-presentation.vercel.app/mock-data</loc></url>
+</urlset>
+

@@ -9,6 +9,7 @@ import { I18nProvider } from '@/lib/i18n'
 const HomePage = lazy(() => import('@/pages/HomePage').then(module => ({ default: module.HomePage })))
 const GenericConverterPage = lazy(() => import('@/pages/GenericConverterPage').then(module => ({ default: module.GenericConverterPage })))
 const NotFoundPage = lazy(() => import('@/pages/NotFoundPage').then(module => ({ default: module.NotFoundPage })))
+const HowToConverterPage = lazy(() => import('@/pages/HowToConverterPage').then(module => ({ default: module.HowToConverterPage })))
 
 function App() {
     return (
@@ -18,6 +19,7 @@ function App() {
                     <Route path="/" element={<DevToolsLayout />}>
                         <Route index element={<HomePage />} />
                         <Route path=":slug" element={<GenericConverterPage />} />
+                        <Route path="how-to/:slug" element={<HowToConverterPage />} />
                         {devTools
                             .filter(t => t.getComponent)
                             .map(t => {

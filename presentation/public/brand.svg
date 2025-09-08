@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="256" height="256" viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg" role="img"
+    aria-labelledby="title desc">
+    <title id="title">DevTools Presentation</title>
+    <desc id="desc">Marca em forma de prisma com gradiente representando transformação de dados e tecnologia</desc>
+    <defs>
+        <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#5B8CFF" />
+            <stop offset="50%" stop-color="#7C4DFF" />
+            <stop offset="100%" stop-color="#00C2A8" />
+        </linearGradient>
+        <filter id="s" x="-10%" y="-10%" width="120%" height="120%">
+            <feDropShadow dx="0" dy="6" stdDeviation="8" flood-color="#000" flood-opacity="0.15" />
+        </filter>
+    </defs>
+
+    <g filter="url(#s)">
+        <path d="M128 36 L200 78 L200 178 L128 220 L56 178 L56 78 Z" fill="url(#g)" />
+        <path d="M128 64 L176 92 L176 164 L128 192 L80 164 L80 92 Z" fill="#0B0F1A" opacity="0.15" />
+    </g>
+    <g>
+        <rect x="84" y="104" width="88" height="16" rx="8" fill="#FFFFFF" opacity="0.9" />
+        <rect x="84" y="136" width="56" height="16" rx="8" fill="#FFFFFF" opacity="0.9" />
+        <circle cx="164" cy="144" r="8" fill="#00C2A8" />
+    </g>
+</svg>

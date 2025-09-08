@@ -4,6 +4,7 @@ import { DiffCodeEditor } from '@/components/common/ui/DiffCodeEditor'
 import { Button } from '@/components/ui/Button'
 import { useComparators } from '@/hooks/useComparators'
 import { useTranslation } from '@/lib/i18n'
+import { Seo, JsonLd } from '@/components/common/Seo'
 import { AdSlot } from '@/components/ads/AdSlot'
 
 export function ComparatorPage() {
@@ -29,6 +30,33 @@ export function ComparatorPage() {
 
     return (
         <div className="space-y-6">
+            <Seo
+                title={`${t('dataComparator')} — DevTools`}
+                description={t('dataComparator_desc')}
+                canonical={`https://dev-tools-presentation.vercel.app/comparator`}
+                openGraph={{
+                    type: 'article',
+                    url: `https://dev-tools-presentation.vercel.app/comparator`,
+                    title: `${t('dataComparator')} — DevTools`,
+                    description: t('dataComparator_desc'),
+                    siteName: 'DevTools'
+                }}
+                twitter={{
+                    card: 'summary_large_image',
+                    site: '@devtools',
+                    title: `${t('dataComparator')} — DevTools`,
+                    description: t('dataComparator_desc')
+                }}
+            >
+                <JsonLd data={{
+                    '@context': 'https://schema.org',
+                    '@type': 'FAQPage',
+                    mainEntity: [
+                        { '@type': 'Question', name: 'Como comparar JSON?', acceptedAnswer: { '@type': 'Answer', text: 'Cole os dois JSONs, escolha o modo JSON e veja as diferenças.' } },
+                        { '@type': 'Question', name: 'Posso comparar texto?', acceptedAnswer: { '@type': 'Answer', text: 'Sim, altere para o modo texto para comparar diffs de strings.' } }
+                    ]
+                }} />
+            </Seo>
             <div className="flex gap-2">
                 <Button variant={mode === 'json' ? 'default' : 'secondary'} onClick={() => setMode('json')}>{t('json')}</Button>
                 <Button variant={mode === 'text' ? 'default' : 'secondary'} onClick={() => setMode('text')}>{t('text')}</Button>

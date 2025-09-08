@@ -16,8 +16,8 @@ import { getTranslatedToolsFor } from '@/config/tools'
 import { ThemeSwitch } from '@/components/common/ThemeSwitch'
 import { LanguageSelector } from '@/components/ui/LanguageSelector'
 import { HeaderProvider, useHeader } from './HeaderContext'
-import { FileText } from 'lucide-react'
 import { AdSlot } from '@/components/ads/AdSlot'
+import { Seo, JsonLd } from '@/components/common/Seo'
 
 interface DevToolsLayoutProps {
     className?: string
@@ -32,9 +32,7 @@ function HeaderBar() {
                 {/* Left column aligned with sidebar */}
                 <div className="hidden md:flex items-center h-16 px-4 md:px-6 lg:px-8 md:border-r">
                     <Link to="/" className="flex items-center space-x-2 min-w-0">
-                        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-                            <FileText className="h-4 w-4" />
-                        </div>
+                        <img src="/brand.svg" alt="Logo" className="h-8 w-8" />
                         <span className="text-lg font-semibold truncate">{t('brandName')}</span>
                     </Link>
                 </div>
@@ -121,6 +119,35 @@ export function DevToolsLayout({ className }: DevToolsLayoutProps) {
     return (
         <HeaderProvider defaultTitle={t('brandName')} defaultSubtitle={t('modernToolsDescription')}>
             <div className={cn('layout-grid bg-background', className)}>
+                <Seo
+                    title={`${t('brandName')} — ${t('modernToolsDescription')}`}
+                    description={t('modernToolsDescription')}
+                    canonical={`https://dev-tools-presentation.vercel.app${location.pathname}`}
+                    openGraph={{
+                        type: 'website',
+                        url: `https://dev-tools-presentation.vercel.app${location.pathname}`,
+                        title: `${t('brandName')} — ${t('modernToolsDescription')}`,
+                        description: t('modernToolsDescription'),
+                        siteName: t('brandName')
+                    }}
+                    twitter={{
+                        card: 'summary_large_image',
+                        site: '@devtools',
+                        title: `${t('brandName')} — ${t('modernToolsDescription')}`,
+                        description: t('modernToolsDescription')
+                    }}
+                >
+                    <JsonLd data={{
+                        '@context': 'https://schema.org',
+                        '@type': 'SoftwareApplication',
+                        name: t('brandName'),
+                        applicationCategory: 'DeveloperApplication',
+                        operatingSystem: 'Web',
+                        description: t('modernToolsDescription'),
+                        url: `https://dev-tools-presentation.vercel.app${location.pathname}`,
+                        offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' }
+                    }} />
+                </Seo>
                 {/* Sidebar column */}
                 <aside className="area-aside hidden md:block h-full border-r">
                     <Sidebar />
@@ -131,9 +158,10 @@ export function DevToolsLayout({ className }: DevToolsLayoutProps) {
                 <HeaderBar />
                 <HeaderSync />
                 <main className="area-main overflow-y-auto py-6 px-6 md:px-8 lg:px-16">
-                    {/* Header banner ad slot with reserved height to avoid CLS */}
+                    {/* Header banner ad slot (collapses when no fill) */}
 
                     <AdSlot slot="header_banner" />
+
 
                     {/* Breadcrumb */}
                     <BreadcrumbNav items={breadcrumbs} />

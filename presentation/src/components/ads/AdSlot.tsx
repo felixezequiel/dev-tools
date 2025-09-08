@@ -52,8 +52,11 @@ function DummyAd({ slot, onClick }: { slot: AdPlacement; onClick?: () => void })
 }
 
 export function AdSlot({ slot, className, style }: AdSlotProps) {
-    if (!adsConfig.enabled) return null
+    const adsEnabled = adsConfig.enabled
     const { visible, dismiss } = useAdVisibility(slot)
+    const containerRef = React.useRef<HTMLDivElement | null>(null)
+    const insRef = React.useRef<HTMLModElement | null>(null)
+    const [collapsed, setCollapsed] = React.useState<boolean>(false)
 
     const handleClick = () => {
         try {
@@ -62,16 +65,36 @@ export function AdSlot({ slot, className, style }: AdSlotProps) {
         } catch { }
     }
 
-    if (!visible) return null
+    // Collapse placeholder if ad doesn't render shortly (prevents blank space when no fill)
+    React.useEffect(() => {
+        if (!visible || !adsEnabled) return
+        if (adsConfig.provider !== 'adsense') return
+        const timer = window.setTimeout(() => {
+            const h = insRef.current?.clientHeight ?? 0
+            if (h < 20) setCollapsed(true)
+        }, 2500)
+        let observer: MutationObserver | null = null
+        if (typeof MutationObserver !== 'undefined' && insRef.current) {
+            observer = new MutationObserver(() => {
+                const h = insRef.current?.clientHeight ?? 0
+                if (h >= 20) setCollapsed(false)
+            })
+            observer.observe(insRef.current, { childList: true, subtree: true })
+        }
+        return () => {
+            window.clearTimeout(timer)
+            observer?.disconnect()
+        }
+    }, [slot, visible, adsEnabled])
+
+    if (!visible || !adsEnabled) return null
 
     // If provider is AdSense, render official ins tag and push
     if (adsConfig.provider === 'adsense' && typeof window !== 'undefined') {
         const client = adsConfig.adsense?.clientId
         const slotId = adsConfig.adsense?.slots[slot]
         // Render nothing if slot not configured yet
-        if (!client || !slotId) {
-            return null
-        }
+        const configured = Boolean(client && slotId)
         // Ensure script is present once (skip if global exists)
         const SCRIPT_ID = 'adsense-script'
         // @ts-ignore
@@ -85,9 +108,15 @@ export function AdSlot({ slot, className, style }: AdSlotProps) {
             document.head.appendChild(s)
         }
 
-        // Create ins element per render
+        // Create ins element per render. No minimum height reserved; hide if not filled
         return (
-            <div className={cn('relative', className)} style={style} data-ad-slot={slot} data-ad-unit-key={getAdUnitKey(slot)}>
+            <div
+                ref={containerRef}
+                className={cn('relative', className)}
+                style={{ ...(collapsed ? { display: 'none' } : {}), ...style }}
+                data-ad-slot={slot}
+                data-ad-unit-key={getAdUnitKey(slot)}
+            >
                 <button
                     type="button"
                     aria-label="Fechar anúncio"
@@ -96,22 +125,27 @@ export function AdSlot({ slot, className, style }: AdSlotProps) {
                 >
                     ×
                 </button>
-                <ins
-                    className="adsbygoogle block"
-                    style={{ display: 'block' }}
-                    data-ad-client={client}
-                    data-ad-slot={slotId}
-                    data-ad-format="auto"
-                    data-full-width-responsive="true"
-                    {...(typeof window !== 'undefined' && /^(localhost|127\\.0\\.0\\.1)$/.test(window.location.hostname) ? { 'data-adtest': 'on' } : {})}
-                />
-                {(() => {
-                    try {
-                        // @ts-ignore
-                        ; (window.adsbygoogle = window.adsbygoogle || []).push({})
-                    } catch { }
-                    return null
-                })()}
+                {configured && (
+                    <>
+                        <ins
+                            ref={insRef as any}
+                            className="adsbygoogle block"
+                            style={{ display: 'block' }}
+                            data-ad-client={client}
+                            data-ad-slot={slotId}
+                            data-ad-format="auto"
+                            data-full-width-responsive="true"
+                            {...(typeof window !== 'undefined' && /^(localhost|127\\.0\\.0\\.1)$/.test(window.location.hostname) ? { 'data-adtest': 'on' } : {})}
+                        />
+                        {(() => {
+                            try {
+                                // @ts-ignore
+                                ; (window.adsbygoogle = window.adsbygoogle || []).push({})
+                            } catch { }
+                            return null
+                        })()}
+                    </>
+                )}
             </div>
         )
     }
