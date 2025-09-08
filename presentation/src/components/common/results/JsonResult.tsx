@@ -4,6 +4,7 @@ import { CodeEditor } from '@/components/common/ui/CodeEditor'
 import type { ResultRendererProps } from '@/types/converter'
 import { Check, Copy, Download } from 'lucide-react'
 import { useMemo, useState } from 'react'
+import { AdSlot } from '@/components/ads/AdSlot'
 
 type JsonProps = Omit<ResultRendererProps, 'config' | 'input' | 'inputType'>
 
@@ -45,7 +46,9 @@ export function JsonResult({ result, onCopy, onDownload, version, updatedAt, jus
                     </Button>
                 </div>
             </div>
-            <CodeEditor value={code} onChange={() => {}} readOnly language="json" height={360} />
+            <CodeEditor value={code} onChange={() => { }} readOnly language="json" height={360} />
+
+            <AdSlot slot="converter_output_footer" />
         </div>
     )
 }

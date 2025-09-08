@@ -4,6 +4,7 @@ import { Badge } from '@/components/ui/Badge'
 import { Button } from '@/components/ui/Button'
 import { motion } from 'framer-motion'
 import { Check, Copy, Database, Eye, EyeOff } from 'lucide-react'
+import { AdSlot } from '@/components/ads/AdSlot'
 
 export function FormDataResult({ result, onCopy, version, updatedAt, justUpdated }: ResultRendererProps) {
     const [showPreview, setShowPreview] = useState(false)
@@ -137,6 +138,8 @@ export function FormDataResult({ result, onCopy, version, updatedAt, justUpdated
                     </div>
                 </motion.div>
             )}
+
+            <AdSlot slot="converter_output_footer" />
         </div>
     )
 }

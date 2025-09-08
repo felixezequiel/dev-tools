@@ -4,6 +4,7 @@ import { Badge } from '@/components/ui/Badge'
 import { Button } from '@/components/ui/Button'
 import { Copy, Check, Download, Database } from 'lucide-react'
 import { formatSql } from '@/lib/sqlFormatter'
+import { AdSlot } from '@/components/ads/AdSlot'
 
 function tryParseJson<T = any>(value: unknown): T | null {
     if (typeof value === 'string') {
@@ -98,6 +99,8 @@ export function DBMigrationResult({ result, onDownload, version, updatedAt, just
                 <span>{lines} linhas • {statements} comandos</span>
                 <span>~{size} bytes</span>
             </div>
+
+            <AdSlot slot="converter_output_footer" />
         </div>
     )
 }

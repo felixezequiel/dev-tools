@@ -5,6 +5,7 @@ import { useState } from 'react'
 import { Home, FileText, ChevronDown } from 'lucide-react'
 import { getTranslatedToolsFor } from '@/config/tools'
 import { useTranslation } from '@/lib/i18n'
+import { AdSlot } from '@/components/ads/AdSlot'
 
 interface SidebarProps {
     className?: string
@@ -124,8 +125,14 @@ export function Sidebar({ className }: SidebarProps) {
                             })}
                         </div>
                     </div>
+
+
                 </div>
             </nav>
+            {/* Sidebar sticky ad slot */}
+            <div className="border-t w-100 p-4">
+                <AdSlot slot="sidebar_sticky" />
+            </div>
         </div>
     )
 }

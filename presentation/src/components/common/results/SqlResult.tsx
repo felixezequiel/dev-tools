@@ -5,6 +5,7 @@ import type { ResultRendererProps } from '@/types/converter'
 type SqlProps = Omit<ResultRendererProps, 'config' | 'input' | 'inputType'>
 import { Check, Copy, Download } from 'lucide-react'
 import { useState } from 'react'
+import { AdSlot } from '@/components/ads/AdSlot'
 
 export function SqlResult({ result, onCopy, onDownload, version, updatedAt, justUpdated }: SqlProps) {
     const [copied, setCopied] = useState(false)
@@ -39,7 +40,9 @@ export function SqlResult({ result, onCopy, onDownload, version, updatedAt, just
                     </Button>
                 </div>
             </div>
-            <CodeEditor value={sql} onChange={() => {}} readOnly language="sql" height={360} />
+            <CodeEditor value={sql} onChange={() => { }} readOnly language="sql" height={360} />
+
+            <AdSlot slot="converter_output_footer" />
         </div>
     )
 }

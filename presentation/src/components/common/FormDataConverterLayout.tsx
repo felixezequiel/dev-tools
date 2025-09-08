@@ -17,6 +17,7 @@ import type { InputType } from '@/config/data-support'
 import { copyToClipboard } from '@/lib/utils'
 import { FileText, Copy, Check, AlertCircle, Zap, Eye, EyeOff, Database } from 'lucide-react'
 import { useTranslation } from '@/lib/i18n'
+import { AdSlot } from '@/components/ads/AdSlot'
 
 interface FormDataConverterLayoutProps {
     breadcrumbs: Array<{ label: string; path?: string; isActive?: boolean }>
@@ -242,7 +243,10 @@ export function FormDataConverterLayout({ breadcrumbs }: FormDataConverterLayout
                         </CardContent>
                     </Card>
                 </motion.div>
-
+                {/* Inline Ad between Input and Output */}
+                <div className="lg:col-span-2">
+                    <AdSlot slot="converter_inline" />
+                </div>
                 {/* Output Section */}
                 <motion.div
                     initial={{ opacity: 0, x: 20 }}

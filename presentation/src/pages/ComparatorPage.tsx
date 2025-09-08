@@ -4,6 +4,7 @@ import { DiffCodeEditor } from '@/components/common/ui/DiffCodeEditor'
 import { Button } from '@/components/ui/Button'
 import { useComparators } from '@/hooks/useComparators'
 import { useTranslation } from '@/lib/i18n'
+import { AdSlot } from '@/components/ads/AdSlot'
 
 export function ComparatorPage() {
     const { t } = useTranslation()
@@ -47,6 +48,8 @@ export function ComparatorPage() {
                         height={420}
                     />
                 </Card>
+                {/* Mid content ad after editor */}
+                <AdSlot slot="comparator_mid" />
             </div>
 
             <Card className="p-4">

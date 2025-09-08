@@ -8,6 +8,7 @@ import type { ResultRendererProps } from '@/types/converter'
 type CsvProps = Omit<ResultRendererProps, 'config' | 'input' | 'inputType'>
 import { Check, Copy, Download, Eye, EyeOff } from 'lucide-react'
 import { useTranslation } from '@/lib/i18n'
+import { AdSlot } from '@/components/ads/AdSlot'
 
 export function CsvResult({ result, onCopy, onDownload, version, updatedAt, justUpdated }: CsvProps) {
     const [view, setView] = useState<'table' | 'raw'>('table')
@@ -93,6 +94,8 @@ export function CsvResult({ result, onCopy, onDownload, version, updatedAt, just
             ) : (
                 <CodeEditor value={csv} onChange={() => { }} readOnly language="plaintext" height={320} />
             )}
+
+            <AdSlot slot="converter_output_footer" />
         </Card>
     )
 }

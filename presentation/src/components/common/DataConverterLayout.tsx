@@ -23,6 +23,7 @@ import { SectionHeading } from '@/components/common/ui/SectionHeading'
 import type { DataConverterConfig } from '@/types/converter'
 import { FileText, Download, Copy, Check, AlertCircle, Zap } from 'lucide-react'
 import { useTranslation } from '@/lib/i18n'
+import { AdSlot } from '@/components/ads/AdSlot'
 
 // DataConverterConfig movido para '@/types/converter'
 
@@ -254,6 +255,7 @@ export function DataConverterLayout({ config }: DataConverterLayoutProps) {
                     initial={{ opacity: 0, x: 20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ duration: 0.5, delay: 0.2 }}
+                    className="space-y-4"
                 >
                     <Card>
                         <CardHeader>
@@ -396,8 +398,13 @@ export function DataConverterLayout({ config }: DataConverterLayoutProps) {
                                     </div>
                                 </div>
                             )}
+                            {/* Output footer ad */}
+                            <AdSlot slot="converter_output_footer" />
                         </CardContent>
+
                     </Card>
+
+                    <AdSlot slot="converter_output_footer" />
                 </motion.div>
             </div>
         </div>

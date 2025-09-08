@@ -123,6 +123,7 @@ export function DevToolsLayout({ className }: DevToolsLayoutProps) {
                 {/* Sidebar column */}
                 <aside className="area-aside hidden md:block h-full border-r">
                     <Sidebar />
+                    {/* Sidebar sticky ad slot */}
                 </aside>
 
                 {/* Right column: header + content */}
