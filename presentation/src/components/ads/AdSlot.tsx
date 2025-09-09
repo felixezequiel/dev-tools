@@ -87,6 +87,19 @@ export function AdSlot({ slot, className, style }: AdSlotProps) {
         }
     }, [slot, visible, adsEnabled])
 
+    // Initialize AdSense rendering once per mount for configured slots
+    React.useEffect(() => {
+        if (!visible || !adsEnabled) return
+        if (adsConfig.provider !== 'adsense') return
+        const client = adsConfig.adsense?.clientId
+        const slotId = adsConfig.adsense?.slots[slot]
+        if (!client || !slotId) return
+        try {
+            // @ts-ignore
+            (window.adsbygoogle = window.adsbygoogle || []).push({})
+        } catch { }
+    }, [visible, adsEnabled, slot])
+
     if (!visible || !adsEnabled) return null
 
     // If provider is AdSense, render official ins tag and push
@@ -126,25 +139,16 @@ export function AdSlot({ slot, className, style }: AdSlotProps) {
                     ×
                 </button>
                 {configured && (
-                    <>
-                        <ins
-                            ref={insRef as any}
-                            className="adsbygoogle block"
-                            style={{ display: 'block' }}
-                            data-ad-client={client}
-                            data-ad-slot={slotId}
-                            data-ad-format="auto"
-                            data-full-width-responsive="true"
-                            {...(typeof window !== 'undefined' && /^(localhost|127\\.0\\.0\\.1)$/.test(window.location.hostname) ? { 'data-adtest': 'on' } : {})}
-                        />
-                        {(() => {
-                            try {
-                                // @ts-ignore
-                                ; (window.adsbygoogle = window.adsbygoogle || []).push({})
-                            } catch { }
-                            return null
-                        })()}
-                    </>
+                    <ins
+                        ref={insRef as any}
+                        className="adsbygoogle block"
+                        style={{ display: 'block' }}
+                        data-ad-client={client}
+                        data-ad-slot={slotId}
+                        data-ad-format="auto"
+                        data-full-width-responsive="true"
+                        {...(typeof window !== 'undefined' && /^(localhost|127\\.0\\.0\\.1)$/.test(window.location.hostname) ? { 'data-adtest': 'on' } : {})}
+                    />
                 )}
             </div>
         )
